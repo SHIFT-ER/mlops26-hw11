@@ -86,6 +86,11 @@
 <code>helm upgrade --install monitoring</code> → <code>helm upgrade --install sim</code>).
 <b>Удаление:</b> <code>make down</code> (= <code>kind delete cluster --name hw11 &amp;&amp; docker image rm hw11-sim:0.1.1</code>),
 освобождает ≈ 4,8 ГБ. Базовые образы удаляются отдельной командой из README, ещё ≈ 1,7 ГБ.</p>
+<p><b>Повторяемость проверена с нуля</b> после всех правок (<code>results/checks/clean-run.log</code>): <code>make down</code> — 4 с, кластера нет;
+<code>make up</code> — 3 мин 22 с (базовые образы уже скачаны): новый кластер kind, пересборка <code>hw11-sim:0.1.1</code>, загрузка образов,
+metrics-server (API <code>Available</code>), мониторинг, сервис с 2 репликами, маршрутизатором и 4 клиентами; затем <code>make test-local</code> — 4 passed,
+<code>make test-k8s</code> — 5 passed. Ограничение: образ воспроизводим по содержимому, но не побайтно, потому что слой <code>apt-get</code> (tini 0.19.*, curl)
+собирается из текущего индекса Debian. Для побайтной воспроизводимости нужно публиковать образ в registry и закреплять его по digest.</p>
 
 <h3>1.2 Helm-чарт <code>charts/llm-sim</code></h3>
 <ul>

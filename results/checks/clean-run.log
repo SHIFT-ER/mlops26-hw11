@@ -1,0 +1,167 @@
+# чистый прогон: make down -> make up -> make test-local -> make test-k8s
+# начало: воскресенье, 15 ноября 2026 г. 00:43:08 (MSK)
+
+## make down
+./scripts/down.sh
+Deleting cluster "hw11" ...
+Deleted nodes: ["hw11-control-plane"]
+Untagged: hw11-sim:0.1.1
+Deleted: sha256:7dab9bed2a4c81b51a316fd4e0c6debc632e4688ea9032baf94a1740d5970ea4
+make down  0,07s user 0,08s system 3% cpu 4,197 total
+
+## kind get clusters после down: [No kind clusters found.]
+
+## make up
+./scripts/up.sh
+No kind clusters found.
+Creating cluster "hw11" ...
+ • Ensuring node image (kindest/node:v1.37.0) 🖼️  ...
+ ✓ Ensuring node image (kindest/node:v1.37.0) 🖼️
+ • Preparing nodes 📦   ...
+ ✓ Preparing nodes 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+ • Waiting ≤ 2m0s for control-plane = Ready ⏳  ...
+ ✓ Waiting ≤ 2m0s for control-plane = Ready ⏳
+ • Ready after 19s 💚
+Set kubectl context to "kind-hw11"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-hw11
+
+Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
+#0 building with "orbstack" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile:
+#1 transferring dockerfile: 988B done
+#1 DONE 0.3s
+
+#2 [internal] load metadata for docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 115B 0.0s done
+#3 DONE 0.4s
+
+#4 [1/9] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 8.24kB done
+#5 DONE 0.4s
+
+#6 [3/9] WORKDIR /srv
+#6 CACHED
+
+#7 [4/9] COPY requirements.lock .
+#7 CACHED
+
+#8 [5/9] RUN pip install --no-cache-dir --require-hashes -r requirements.lock
+#8 CACHED
+
+#9 [2/9] RUN apt-get update && apt-get install -y --no-install-recommends tini=0.19.* curl     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [6/9] COPY app/ app/
+#10 CACHED
+
+#11 [7/9] COPY loadgen/ loadgen/
+#11 DONE 1.0s
+
+#12 [8/9] COPY models/ models/
+#12 DONE 1.2s
+
+#13 [9/9] RUN useradd -u 10001 -m sim && chown -R sim /srv
+#13 DONE 2.5s
+
+#14 exporting to image
+#14 exporting layers
+#14 exporting layers 0.2s done
+#14 writing image sha256:b79351d13ad423364bbbdb52ee2a1954f15dd4114d710a0080915ae9656c5f59 done
+#14 naming to docker.io/library/hw11-sim:0.1.1 0.0s done
+#14 DONE 0.5s
+Image: "hw11-sim:0.1.1" with ID "sha256:b79351d13ad423364bbbdb52ee2a1954f15dd4114d710a0080915ae9656c5f59" not yet present on node "hw11-control-plane", loading...
+Image: "prom/prometheus:v3.5.0" with ID "sha256:5a1d4a6d0adfd8f785bb0f1243f2a90457e508eaf5eb7e958aa5ea1463020fcb" not yet present on node "hw11-control-plane", loading...
+Image: "grafana/grafana:12.1.1" with ID "sha256:084f3a553cf1777e85018b325d51228a6edb99d70730044bb6c56f5b04be3932" not yet present on node "hw11-control-plane", loading...
+Image: "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.16.0" with ID "sha256:cf28a2c3ace4c9cf5ce1e5a3b77332f09275e080011bf4b589d50d52f37b38b2" not yet present on node "hw11-control-plane", loading...
+Image: "registry.k8s.io/metrics-server/metrics-server:v0.8.0" with ID "sha256:bc6c1e09a843da7191a25631adb08537bdcf0ee8c188bcb55ca8b51039272809" not yet present on node "hw11-control-plane", loading...
+serviceaccount/metrics-server created
+clusterrole.rbac.authorization.k8s.io/system:aggregated-metrics-reader created
+clusterrole.rbac.authorization.k8s.io/system:metrics-server created
+rolebinding.rbac.authorization.k8s.io/metrics-server-auth-reader created
+clusterrolebinding.rbac.authorization.k8s.io/metrics-server:system:auth-delegator created
+clusterrolebinding.rbac.authorization.k8s.io/system:metrics-server created
+service/metrics-server created
+deployment.apps/metrics-server created
+apiservice.apiregistration.k8s.io/v1beta1.metrics.k8s.io created
+namespace/monitoring created
+namespace/llm created
+Release "monitoring" does not exist. Installing it now.
+NAME: monitoring
+LAST DEPLOYED: Sun Nov 15 00:45:20 2026
+NAMESPACE: monitoring
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+Release "sim" does not exist. Installing it now.
+NAME: sim
+LAST DEPLOYED: Sun Nov 15 00:46:03 2026
+NAMESPACE: llm
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+NAME                          READY   STATUS    RESTARTS   AGE   IP            NODE                 NOMINATED NODE   READINESS GATES
+llm-router-699d9d6bbb-hrhpf   1/1     Running   0          30s   10.244.0.9    hw11-control-plane   <none>           <none>
+llm-sim-6674959984-k56h5      1/1     Running   0          30s   10.244.0.11   hw11-control-plane   <none>           <none>
+llm-sim-6674959984-rc8f9      1/1     Running   0          30s   10.244.0.10   hw11-control-plane   <none>           <none>
+loadclient-0                  1/1     Running   0          30s   10.244.0.12   hw11-control-plane   <none>           <none>
+loadclient-1                  1/1     Running   0          30s   10.244.0.13   hw11-control-plane   <none>           <none>
+loadclient-2                  1/1     Running   0          30s   10.244.0.14   hw11-control-plane   <none>           <none>
+loadclient-3                  1/1     Running   0          30s   10.244.0.15   hw11-control-plane   <none>           <none>
+make up  5,27s user 6,77s system 5% cpu 3:21,57 total
+
+## make test-local
+uv run pytest tests/test_local.py -v
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-8.4.2, pluggy-1.7.0 -- /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collecting ... collected 4 items
+
+tests/test_local.py::test_4_failure_accounting PASSED                    [ 25%]
+tests/test_local.py::test_router_affinity_and_overflow PASSED            [ 50%]
+tests/test_local.py::test_prefix_cache_bounded_lru PASSED                [ 75%]
+tests/test_local.py::test_artifact_hash_is_verified PASSED               [100%]
+
+============================== 4 passed in 4.25s ===============================
+
+## make test-k8s
+uv run pytest tests/test_k8s.py -v
+============================= test session starts ==============================
+platform darwin -- Python 3.12.4, pytest-8.4.2, pluggy-1.7.0 -- /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collecting ... collected 5 items
+
+tests/test_k8s.py::test_1_warming_pod_gets_no_traffic PASSED             [ 20%]
+tests/test_k8s.py::test_2_loaded_version_matches_release PASSED          [ 40%]
+tests/test_k8s.py::test_3_dialog_survives_pod_replacement PASSED         [ 60%]
+tests/test_k8s.py::test_5_two_dialogs_are_isolated[http://llm-sim:8000] PASSED [ 80%]
+tests/test_k8s.py::test_5_two_dialogs_are_isolated[http://llm-router:8000] PASSED [100%]
+
+============================== 5 passed in 59.77s ==============================
+
+# конец: воскресенье, 15 ноября 2026 г. 00:47:40 (MSK)

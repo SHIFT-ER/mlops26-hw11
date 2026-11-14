@@ -43,6 +43,10 @@ make grafana       # Grafana http://127.0.0.1:3000 (анонимно), Prometheu
 откат: `helm rollback sim <ревизия> -n llm`. Исходный дефект прогрева:
 `-f charts/llm-sim/values-naive-probes.yaml`.
 
+**Проверено с нуля** (15.11.2026, `results/checks/clean-run.log`): `make down` (4 с, кластер и образ удалены) →
+`make up` (3 мин 22 с при скачанных базовых образах: кластер, сборка `hw11-sim:0.1.1`, `kind load`,
+metrics-server, мониторинг, сервис) → `make test-local` (4 passed) → `make test-k8s` (5 passed).
+
 ## Удаление стенда
 
 ```bash
