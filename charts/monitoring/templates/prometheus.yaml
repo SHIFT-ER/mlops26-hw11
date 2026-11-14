@@ -1,0 +1,126 @@
+{{- $ns := .Values.targetNamespace -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: prometheus}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: hw11-prometheus}
+rules:
+  - apiGroups: [""]
+    resources: [pods, services, endpoints, nodes, nodes/proxy, nodes/metrics]
+    verbs: [get, list, watch]
+  - nonResourceURLs: [/metrics]
+    verbs: [get]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: hw11-prometheus}
+subjects: [{kind: ServiceAccount, name: prometheus, namespace: {{ .Release.Namespace }}}]
+roleRef: {kind: ClusterRole, name: hw11-prometheus, apiGroup: rbac.authorization.k8s.io}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: prometheus-config}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: {{ .Values.prometheus.scrapeInterval }}
+      evaluation_interval: 5s
+    rule_files: [/etc/prometheus/alerts.yml]
+    scrape_configs:
+      # Каждый Pod сервиса и маршрутизатора — через Kubernetes service discovery (role: pod).
+      - job_name: llm-pods
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces: {names: [{{ $ns }}]}
+        relabel_configs:
+          - {source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape], regex: "true", action: keep}
+          - {source_labels: [__meta_kubernetes_pod_phase], regex: Running, action: keep}
+          - source_labels: [__meta_kubernetes_pod_ip, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            regex: (.+);(.+)
+            replacement: $1:$2
+            target_label: __address__
+          - {source_labels: [__meta_kubernetes_pod_name], target_label: pod}
+          - {source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name], target_label: app}
+          - {source_labels: [__meta_kubernetes_pod_label_model_version], target_label: version}
+      # CPU/RAM контейнеров из cAdvisor kubelet (через proxy API-сервера), только нужный namespace.
+      - job_name: cadvisor
+        scheme: https
+        tls_config: {ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt}
+        authorization: {credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token}
+        kubernetes_sd_configs: [{role: node}]
+        relabel_configs:
+          - {target_label: __address__, replacement: kubernetes.default.svc:443}
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+        metric_relabel_configs:
+          - {source_labels: [namespace], regex: {{ $ns }}, action: keep}
+          - {source_labels: [__name__], regex: "container_cpu_usage_seconds_total|container_memory_working_set_bytes|container_cpu_cfs_throttled_periods_total|container_cpu_cfs_periods_total", action: keep}
+          - {regex: "id|image|name", action: labeldrop}
+      - job_name: kube-state-metrics
+        static_configs: [{targets: ["kube-state-metrics:8080"]}]
+      - job_name: prometheus
+        static_configs: [{targets: ["localhost:9090"]}]
+  alerts.yml: |
+    groups:
+      - name: llm-sim
+        rules:
+          # p95 TTFC из суммарных bucket-счётчиков всех Pod за 1m; не меньше minRequests наблюдений.
+          - alert: SimHighTTFC
+            expr: |
+              histogram_quantile(0.95, sum by (le) (rate(sim_ttfc_seconds_bucket[1m]))) > {{ .Values.alerts.ttfcP95Seconds }}
+              and on() sum(increase(sim_ttfc_seconds_count[1m])) >= {{ .Values.alerts.minRequests }}
+            for: {{ .Values.alerts.for }}
+            labels: {severity: warning}
+            annotations:
+              summary: "p95 TTFC > {{ .Values.alerts.ttfcP95Seconds }} s (окно 1m, >= {{ .Values.alerts.minRequests }} ответов)"
+          # Доля отказов (429/503) и оборванных/ошибочных ответов среди всех запросов сервиса.
+          - alert: SimHighErrorRatio
+            expr: |
+              sum(rate(sim_requests_total{outcome!="ok"}[1m])) / sum(rate(sim_requests_total[1m])) > {{ .Values.alerts.errorRatio }}
+              and on() sum(increase(sim_requests_total[1m])) >= {{ .Values.alerts.minRequests }}
+            for: {{ .Values.alerts.for }}
+            labels: {severity: critical}
+            annotations:
+              summary: "доля отказов > {{ .Values.alerts.errorRatio }} (окно 1m, >= {{ .Values.alerts.minRequests }} запросов)"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: prometheus}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: prometheus}}
+  template:
+    metadata:
+      labels: {app: prometheus}
+      annotations: {checksum/config: {{ .Values | toJson | sha256sum }}}
+    spec:
+      serviceAccountName: prometheus
+      containers:
+        - name: prometheus
+          image: {{ .Values.prometheus.image }}
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --storage.tsdb.retention.time={{ .Values.prometheus.retentionTime }}
+            - --storage.tsdb.retention.size={{ .Values.prometheus.retentionSize }}
+            - --web.enable-lifecycle
+          ports: [{containerPort: 9090}]
+          resources: {{- toYaml .Values.prometheus.resources | nindent 12 }}
+          readinessProbe: {httpGet: {path: /-/ready, port: 9090}, periodSeconds: 5}
+          volumeMounts:
+            - {name: config, mountPath: /etc/prometheus}
+            - {name: data, mountPath: /prometheus}
+      volumes:
+        - {name: config, configMap: {name: prometheus-config}}
+        - {name: data, emptyDir: {sizeLimit: {{ .Values.prometheus.volumeSizeLimit }}}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: prometheus}
+spec:
+  selector: {app: prometheus}
+  ports: [{port: 9090, targetPort: 9090}]

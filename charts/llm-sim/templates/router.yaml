@@ -1,0 +1,56 @@
+{{- if .Values.router.enabled }}
+apiVersion: v1
+kind: ServiceAccount
+metadata: {name: llm-router}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata: {name: llm-router}
+rules:
+  - apiGroups: [discovery.k8s.io]
+    resources: [endpointslices]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata: {name: llm-router}
+subjects: [{kind: ServiceAccount, name: llm-router, namespace: {{ .Release.Namespace }}}]
+roleRef: {kind: Role, name: llm-router, apiGroup: rbac.authorization.k8s.io}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-router
+  labels: {app.kubernetes.io/name: llm-router}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app.kubernetes.io/name: llm-router}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: llm-router}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+    spec:
+      serviceAccountName: llm-router
+      containers:
+        - name: router
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["python", "-m", "app.router"]
+          env:
+            - {name: BACKEND_SERVICE, value: {{ .Values.services.default.name | quote }}}
+            - {name: ROUTER_POLICY, value: {{ .Values.router.policy | quote }}}
+            - {name: BALANCE_THRESHOLD, value: {{ .Values.router.balanceThreshold | quote }}}
+          ports: [{name: http, containerPort: 8000}]
+          resources: {{- toYaml .Values.router.resources | nindent 12 }}
+          readinessProbe: {httpGet: {path: /ready, port: http}, periodSeconds: 2}
+          livenessProbe: {httpGet: {path: /health, port: http}, periodSeconds: 10}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: llm-router}
+spec:
+  selector: {app.kubernetes.io/name: llm-router}
+  ports: [{name: http, port: 8000, targetPort: http}]
+{{- end }}

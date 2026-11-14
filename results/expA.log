@@ -1,0 +1,24 @@
+=== warm-naive 22:44:42
+22:45:09 {"event": "baseline_warm", "pods": ["llm-sim-9d77b8689-jdxkm", "llm-sim-9d77b8689-tcnmm"], "probes": "naive", "ts": 1794685509.034118}
+22:45:35 {"event": "delete_pod", "pod": "llm-sim-9d77b8689-jdxkm", "ts": 1794685535.219091}
+22:46:57 {"event": "summary", "attempts": 133, "logical": 133, "outcomes": {"ok": 133}, "ok": 133, "logical_ok": 133, "error_share": 0.0, "timeout_share": 0.0, "ttfc_p50": 0.8986, "ttfc_p95": 14.5354, "dur_p50
+=== warm-fixed 22:46:57
+22:47:46 {"event": "baseline_warm", "pods": ["llm-sim-6674959984-7sxkj", "llm-sim-6674959984-mlssj"], "probes": "fixed", "ts": 1794685666.92323}
+22:48:13 {"event": "delete_pod", "pod": "llm-sim-6674959984-7sxkj", "ts": 1794685692.999327}
+22:49:35 {"event": "summary", "attempts": 133, "logical": 133, "outcomes": {"ok": 133}, "ok": 133, "logical_ok": 133, "error_share": 0.0, "timeout_share": 0.0, "ttfc_p50": 1.1195, "ttfc_p95": 2.7296, "dur_p50"
+=== rollout 22:49:35
+22:49:56 {"event": "helm_upgrade_start", "to": "B", "ts": 1794685796.895999}
+22:49:58 {"event": "helm_upgrade_applied", "to": "B", "ts": 1794685798.789851}
+22:50:49 {"event": "rollout_status_done", "out": " rollout to finish: 1 old replicas are pending termination...\nWaiting for deployment \"llm-sim\" rollout to finish: 1 old replicas are pending termination...\
+22:52:16 {"event": "summary", "attempts": 198, "logical": 198, "outcomes": {"ok": 198}, "ok": 198, "logical_ok": 198, "error_share": 0.0, "timeout_share": 0.0, "ttfc_p50": 1.1669, "ttfc_p95": 6.5721, "dur_p50"
+=== broken 22:52:16
+22:53:04 {"event": "baseline", "revision": 16, "version": "A", "ts": 1794685984.4620101}
+22:53:24 {"event": "helm_upgrade_start", "to": "B-broken", "ts": 1794686004.41379}
+22:53:26 {"event": "helm_upgrade_applied", "to": "B-broken", "ts": 1794686006.17387}
+22:54:34 {"event": "helm_rollback_start", "to_revision": 16, "ts": 1794686074.4144}
+22:54:36 {"event": "helm_rollback_applied", "to_revision": 16, "ts": 1794686076.2890291}
+22:54:36 {"event": "rollout_status_done", "out": "deployment \"llm-sim\" successfully rolled out", "ts": 1794686076.6298041}
+22:55:43 {"event": "summary", "attempts": 196, "logical": 196, "outcomes": {"ok": 196}, "ok": 196, "logical_ok": 196, "error_share": 0.0, "timeout_share": 0.0, "ttfc_p50": 0.8169, "ttfc_p95": 2.1091, "dur_p50"
+=== kill 22:55:43
+22:56:16 {"event": "kill9", "pod": "llm-sim-6674959984-2t2t5", "ts": 1794686176.406396}
+22:57:32 {"event": "summary", "attempts": 161, "logical": 139, "outcomes": {"ok": 122, "conn_error": 3, "rejected": 34, "aborted": 2}, "ok": 122, "logical_ok": 122, "error_share": 0.2422, "timeout_share": 0.0,

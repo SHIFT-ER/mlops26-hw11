@@ -1,0 +1,40 @@
+суббота, 14 ноября 2026 г. 23:21:10 (MSK)
+# pods
+NAME IP
+llm-router-699d9d6bbb-m6g2h 10.244.0.20
+llm-sim-6674959984-2t2t5 ago)
+llm-sim-6674959984-4nvcw 10.244.0.41
+loadclient-0 10.244.0.25
+loadclient-1 10.244.0.24
+loadclient-2 10.244.0.23
+loadclient-3 10.244.0.21
+
+# iptables (llm-sim-clientip)
+-A KUBE-SEP-EI2N3B4I2AD3NST7 -s 10.244.0.41/32 -m comment --comment "llm/llm-sim-clientip:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-EI2N3B4I2AD3NST7 -p tcp -m comment --comment "llm/llm-sim-clientip:http" -m recent --set --name KUBE-SEP-EI2N3B4I2AD3NST7 --mask 255.255.255.255 --rsource -m tcp -j DNAT --to-destination 10.244.0.41:8000
+-A KUBE-SEP-QWMEZZ7EHEENWIS4 -s 10.244.0.40/32 -m comment --comment "llm/llm-sim-clientip:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-QWMEZZ7EHEENWIS4 -p tcp -m comment --comment "llm/llm-sim-clientip:http" -m recent --set --name KUBE-SEP-QWMEZZ7EHEENWIS4 --mask 255.255.255.255 --rsource -m tcp -j DNAT --to-destination 10.244.0.40:8000
+-A KUBE-SERVICES -d 10.96.59.186/32 -p tcp -m comment --comment "llm/llm-sim-clientip:http cluster IP" -m tcp --dport 8000 -j KUBE-SVC-7LMRJ5PM3UPAAXUY
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY ! -s 10.244.0.0/16 -d 10.96.59.186/32 -p tcp -m comment --comment "llm/llm-sim-clientip:http cluster IP" -m tcp --dport 8000 -j KUBE-MARK-MASQ
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.40:8000" -m recent --rcheck --seconds 10800 --reap --name KUBE-SEP-QWMEZZ7EHEENWIS4 --mask 255.255.255.255 --rsource -j KUBE-SEP-QWMEZZ7EHEENWIS4
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.41:8000" -m recent --rcheck --seconds 10800 --reap --name KUBE-SEP-EI2N3B4I2AD3NST7 --mask 255.255.255.255 --rsource -j KUBE-SEP-EI2N3B4I2AD3NST7
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.40:8000" -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-QWMEZZ7EHEENWIS4
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.41:8000" -j KUBE-SEP-EI2N3B4I2AD3NST7
+
+# xt_recent: IP источника (IP клиентского Pod) -> endpoint
+== /proc/net/xt_recent/KUBE-SEP-EI2N3B4I2AD3NST7
+src=10.244.0.25 ttl: 64 last_seen: 4299472199 oldest_pkt: 15
+src=10.244.0.23 ttl: 64 last_seen: 4299467145 oldest_pkt: 19
+src=10.244.0.21 ttl: 64 last_seen: 4299469399 oldest_pkt: 14
+== /proc/net/xt_recent/KUBE-SEP-QWMEZZ7EHEENWIS4
+src=10.244.0.24 ttl: 64 last_seen: 4299458257 oldest_pkt: 12
+
+# Service default: правила без recent (случайный выбор на каждое новое соединение)
+-A KUBE-SEP-OVNBYNV3F54VNSXH -s 10.244.0.41/32 -m comment --comment "llm/llm-sim:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-OVNBYNV3F54VNSXH -p tcp -m comment --comment "llm/llm-sim:http" -m tcp -j DNAT --to-destination 10.244.0.41:8000
+-A KUBE-SEP-PSRSETNPVR73JRKY -s 10.244.0.40/32 -m comment --comment "llm/llm-sim:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-PSRSETNPVR73JRKY -p tcp -m comment --comment "llm/llm-sim:http" -m tcp -j DNAT --to-destination 10.244.0.40:8000
+-A KUBE-SERVICES -d 10.96.204.247/32 -p tcp -m comment --comment "llm/llm-sim:http cluster IP" -m tcp --dport 8000 -j KUBE-SVC-UNNECOXC2PHHDDGC
+-A KUBE-SVC-UNNECOXC2PHHDDGC ! -s 10.244.0.0/16 -d 10.96.204.247/32 -p tcp -m comment --comment "llm/llm-sim:http cluster IP" -m tcp --dport 8000 -j KUBE-MARK-MASQ
+-A KUBE-SVC-UNNECOXC2PHHDDGC -m comment --comment "llm/llm-sim:http -> 10.244.0.40:8000" -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-PSRSETNPVR73JRKY
+-A KUBE-SVC-UNNECOXC2PHHDDGC -m comment --comment "llm/llm-sim:http -> 10.244.0.41:8000" -j KUBE-SEP-OVNBYNV3F54VNSXH

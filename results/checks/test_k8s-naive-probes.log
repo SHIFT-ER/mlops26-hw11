@@ -1,0 +1,8 @@
+# исходный дефект: helm upgrade ... -f values-naive-probes.yaml (суббота, 14 ноября 2026 г. 23:49:59 (MSK))
+tests/test_k8s.py::test_1_warming_pod_gets_no_traffic FAILED             [100%]
+>               assert not in_eps, f'{name} прогревается (/startup={code}), но уже в Ready EndpointSlice'
+E               AssertionError: llm-sim-9d77b8689-kvs87 прогревается (/startup=503), но уже в Ready EndpointSlice
+E               assert not True
+tests/test_k8s.py:37: AssertionError
+FAILED tests/test_k8s.py::test_1_warming_pod_gets_no_traffic - AssertionError...
+======================= 1 failed, 4 deselected in 4.57s ========================

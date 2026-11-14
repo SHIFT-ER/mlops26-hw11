@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: grafana-provisioning}
+data:
+  datasource.yaml: |
+    apiVersion: 1
+    datasources:
+      - {name: Prometheus, uid: prom, type: prometheus, access: proxy, url: "http://prometheus:9090", isDefault: true,
+         jsonData: {timeInterval: 5s}}
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - {name: hw11, type: file, options: {path: /var/lib/grafana/dashboards}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: {name: grafana-dashboards}
+data:
+  llm-sim.json: |-
+{{ .Files.Get "files/llm-sim-dashboard.json" | indent 4 }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: grafana}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: grafana}}
+  template:
+    metadata:
+      labels: {app: grafana}
+      annotations: {checksum/dash: {{ .Files.Get "files/llm-sim-dashboard.json" | sha256sum }}}
+    spec:
+      containers:
+        - name: grafana
+          image: {{ .Values.grafana.image }}
+          env:
+            - {name: GF_AUTH_ANONYMOUS_ENABLED, value: "true"}
+            - {name: GF_AUTH_ANONYMOUS_ORG_ROLE, value: Admin}
+            - {name: GF_AUTH_DISABLE_LOGIN_FORM, value: "true"}
+            - {name: GF_ANALYTICS_REPORTING_ENABLED, value: "false"}
+            - {name: GF_ANALYTICS_CHECK_FOR_UPDATES, value: "false"}
+            - {name: GF_PLUGINS_PREINSTALL_DISABLED, value: "true"}
+          ports: [{containerPort: 3000}]
+          resources: {{- toYaml .Values.grafana.resources | nindent 12 }}
+          readinessProbe: {httpGet: {path: /api/health, port: 3000}, periodSeconds: 5}
+          volumeMounts:
+            - {name: prov, mountPath: /etc/grafana/provisioning/datasources/ds.yaml, subPath: datasource.yaml}
+            - {name: prov, mountPath: /etc/grafana/provisioning/dashboards/db.yaml, subPath: dashboards.yaml}
+            - {name: dash, mountPath: /var/lib/grafana/dashboards}
+            - {name: data, mountPath: /var/lib/grafana}
+      volumes:
+        - {name: prov, configMap: {name: grafana-provisioning}}
+        - {name: dash, configMap: {name: grafana-dashboards}}
+        - {name: data, emptyDir: {sizeLimit: 256Mi}}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: grafana}
+spec:
+  selector: {app: grafana}
+  ports: [{port: 3000, targetPort: 3000}]

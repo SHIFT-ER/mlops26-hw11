@@ -1,0 +1,206 @@
+{
+ "scale": {
+  "load_phases": "0–30 с: 1 запр/с; 30–270 с: 4,5 запр/с; 270–570 с: 0,5 запр/с",
+  "summary": {
+   "attempts": 1248,
+   "logical": 1248,
+   "outcomes": {
+    "ok": 893,
+    "rejected": 355
+   },
+   "ok": 893,
+   "logical_ok": 893,
+   "error_share": 0.2845,
+   "timeout_share": 0.0,
+   "ttfc_p50": 10.8858,
+   "ttfc_p95": 18.0025,
+   "dur_p50": 11.3027,
+   "dur_p95": 18.5217,
+   "n_ttfc": 893,
+   "send_lag_p95": 0.0101,
+   "send_lag_max": 0.0301,
+   "mean_ttfc": 8.8177
+  },
+  "hpa_desired_changes": [
+   {
+    "t": -4.6,
+    "desired": 2,
+    "current": 2,
+    "cpu": 0
+   },
+   {
+    "t": 30.3,
+    "desired": 3,
+    "current": 2,
+    "cpu": 94
+   },
+   {
+    "t": 376.1,
+    "desired": 2,
+    "current": 3,
+    "cpu": 17
+   }
+  ],
+  "pods": {
+   "llm-sim-6674959984-nl97q": {
+    "created": -141.4,
+    "ready": -4.6
+   },
+   "llm-sim-6674959984-qwppf": {
+    "created": -31.4,
+    "ready": -4.6
+   },
+   "llm-sim-6674959984-pk568": {
+    "created": 29.6,
+    "ready": 53.2,
+    "deleting": 376.1,
+    "gone": 384.3
+   }
+  },
+  "alerts": [
+   {
+    "t": 41.9,
+    "alert": "SimHighTTFC",
+    "state": "pending"
+   },
+   {
+    "t": 66.7,
+    "alert": "SimHighErrorRatio",
+    "state": "pending"
+   },
+   {
+    "t": 70.7,
+    "alert": "SimHighTTFC",
+    "state": "firing"
+   },
+   {
+    "t": 95.4,
+    "alert": "SimHighErrorRatio",
+    "state": "firing"
+   },
+   {
+    "t": 331.5,
+    "alert": "SimHighErrorRatio",
+    "state": "inactive"
+   },
+   {
+    "t": 351.7,
+    "alert": "SimHighTTFC",
+    "state": "inactive"
+   },
+   {
+    "t": 410.0,
+    "alert": "SimHighTTFC",
+    "state": "pending"
+   },
+   {
+    "t": 420.2,
+    "alert": "SimHighTTFC",
+    "state": "inactive"
+   }
+  ],
+  "cpu_max": 195,
+  "share_by_pod": {
+   "nl97q": 680,
+   "qwppf": 404,
+   "pk568": 164
+  }
+ },
+ "hot": {
+  "load_phases": "0–200 с: 2,5 запр/с, skew80 через ClientIP",
+  "summary": {
+   "attempts": 504,
+   "logical": 504,
+   "outcomes": {
+    "ok": 354,
+    "rejected": 150
+   },
+   "ok": 354,
+   "logical_ok": 354,
+   "error_share": 0.2976,
+   "timeout_share": 0.0,
+   "ttfc_p50": 10.1656,
+   "ttfc_p95": 14.3492,
+   "dur_p50": 10.6045,
+   "dur_p95": 14.8871,
+   "n_ttfc": 354,
+   "send_lag_p95": 0.0088,
+   "send_lag_max": 0.0303,
+   "mean_ttfc": 8.8732
+  },
+  "hpa_desired_changes": [
+   {
+    "t": -4.4,
+    "desired": 2,
+    "current": 2,
+    "cpu": 22
+   },
+   {
+    "t": 30.4,
+    "desired": 3,
+    "current": 2,
+    "cpu": 119
+   },
+   {
+    "t": 286.6,
+    "desired": 2,
+    "current": 3,
+    "cpu": 0
+   }
+  ],
+  "pods": {
+   "llm-sim-6674959984-nl97q": {
+    "created": -743.8,
+    "ready": -4.4
+   },
+   "llm-sim-6674959984-qwppf": {
+    "created": -633.8,
+    "ready": -4.4
+   },
+   "llm-sim-6674959984-4wwmc": {
+    "created": 29.2,
+    "ready": 55.0,
+    "deleting": 287.8,
+    "gone": 295.2
+   }
+  },
+  "alerts": [
+   {
+    "t": 17.8,
+    "alert": "SimHighTTFC",
+    "state": "pending"
+   },
+   {
+    "t": 48.5,
+    "alert": "SimHighTTFC",
+    "state": "firing"
+   },
+   {
+    "t": 52.6,
+    "alert": "SimHighErrorRatio",
+    "state": "pending"
+   },
+   {
+    "t": 83.0,
+    "alert": "SimHighErrorRatio",
+    "state": "firing"
+   },
+   {
+    "t": 257.6,
+    "alert": "SimHighErrorRatio",
+    "state": "inactive"
+   },
+   {
+    "t": 263.6,
+    "alert": "SimHighTTFC",
+    "state": "inactive"
+   }
+  ],
+  "cpu_max": 119,
+  "share_by_pod": {
+   "nl97q": 45,
+   "qwppf": 459,
+   "4wwmc": 0
+  }
+ }
+}

@@ -1,0 +1,112 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: sim
+      meta.helm.sh/release-namespace: llm
+    creationTimestamp: "2026-11-14T19:16:57Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+    name: llm-router
+    namespace: llm
+    resourceVersion: "1702"
+    uid: ce83d15a-0fd0-46c1-83fa-0e611f4a3409
+  spec:
+    clusterIP: 10.96.199.171
+    clusterIPs:
+    - 10.96.199.171
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/name: llm-router
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: sim
+      meta.helm.sh/release-namespace: llm
+    creationTimestamp: "2026-11-14T19:16:57Z"
+    labels:
+      app.kubernetes.io/instance: sim
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: llm-sim
+    name: llm-sim
+    namespace: llm
+    resourceVersion: "1703"
+    uid: 5ed6aa81-25b5-413d-829a-398b6875798a
+  spec:
+    clusterIP: 10.96.204.247
+    clusterIPs:
+    - 10.96.204.247
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/instance: sim
+      app.kubernetes.io/name: llm-sim
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: sim
+      meta.helm.sh/release-namespace: llm
+    creationTimestamp: "2026-11-14T19:16:57Z"
+    labels:
+      app.kubernetes.io/instance: sim
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: llm-sim
+    name: llm-sim-clientip
+    namespace: llm
+    resourceVersion: "1707"
+    uid: 84b0d4fe-7a29-48ed-ad4c-5c78e508d0f1
+  spec:
+    clusterIP: 10.96.59.186
+    clusterIPs:
+    - 10.96.59.186
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8000
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/instance: sim
+      app.kubernetes.io/name: llm-sim
+    sessionAffinity: ClientIP
+    sessionAffinityConfig:
+      clientIP:
+        timeoutSeconds: 10800
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

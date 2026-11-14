@@ -1,0 +1,1 @@
+{"run": "A-warm-fixed", "target": "http://llm-sim:8000", "start_at": 1794685671.868243, "schedule": "/Users/pavel_sab/Documents/MLOps 7 \u0441\u0435\u043c/\u0414\u0417/\u0414\u041711/hw11/results/expA/warm-fixed/schedule.json", "retries": 0, "timeout": 30, "keepalive": false}

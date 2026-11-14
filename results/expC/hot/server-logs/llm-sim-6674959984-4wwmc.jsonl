@@ -1,0 +1,6 @@
+{"event": "warmup_start", "pod": "llm-sim-6674959984-4wwmc", "model_version": "A", "warmup_seconds": 20.0, "ts": 1794690181.7334032}
+{"event": "process_start", "pod": "llm-sim-6674959984-4wwmc", "pid": 11, "ts": 1794690181.757688}
+{"event": "warmup_done", "pod": "llm-sim-6674959984-4wwmc", "model_version": "A", "ts": 1794690201.7461596}
+{"event": "drain_start", "pod": "llm-sim-6674959984-4wwmc", "running": 0, "waiting": 0, "ts": 1794690435.7756622}
+{"event": "drain_done", "pod": "llm-sim-6674959984-4wwmc", "running": 0, "ts": 1794690441.7768323}
+{"event": "process_stop", "pod": "llm-sim-6674959984-4wwmc", "running": 0, "ts": 1794690441.9706078}

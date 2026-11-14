@@ -1,0 +1,24 @@
+{{- $s := .Values.services -}}
+# Обычный Service: kube-proxy (iptables) выбирает Pod случайно на КАЖДОЕ новое TCP-соединение.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $s.default.name }}
+  labels: {{- include "sim.labels" . | nindent 4 }}
+spec:
+  selector: {{- include "sim.selector" . | nindent 4 }}
+  ports: [{name: http, port: {{ $s.default.port }}, targetPort: http}]
+  sessionAffinity: None
+---
+# Тот же набор Pod, привязка по IP источника, который видит kube-proxy (IP клиентского Pod).
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $s.clientIP.name }}
+  labels: {{- include "sim.labels" . | nindent 4 }}
+spec:
+  selector: {{- include "sim.selector" . | nindent 4 }}
+  ports: [{name: http, port: {{ $s.clientIP.port }}, targetPort: http}]
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP: {timeoutSeconds: {{ $s.clientIP.timeoutSeconds }}}

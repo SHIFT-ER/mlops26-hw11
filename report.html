@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ДЗ 11 · Kubernetes под нагрузкой</title>
+<style>
+  :root { --fg:#1d2330; --muted:#5b6475; --line:#d9dee8; --bg:#ffffff; --soft:#f4f6fa; --accent:#6a4bd8; --ok:#1f8a4c; --bad:#c0392b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.55 -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  main { max-width: 1060px; margin: 0 auto; padding: 28px 18px 60px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 21px; margin: 38px 0 10px; padding-top: 10px; border-top: 2px solid var(--line); }
+  h3 { font-size: 16.5px; margin: 22px 0 6px; }
+  p, li { max-width: 92ch; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .note { background: var(--soft); border-left: 4px solid var(--accent); padding: 10px 14px; margin: 12px 0; }
+  .warn { border-left-color: #d98a1f; }
+  table { border-collapse: collapse; margin: 10px 0 14px; font-size: 13.5px; width: 100%; display:block; overflow-x:auto; }
+  th, td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); font-weight: 600; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  code, pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+  code { background: var(--soft); padding: 1px 4px; border-radius: 3px; }
+  pre { background: var(--soft); padding: 10px 12px; overflow-x: auto; border-radius: 4px; }
+  figure { margin: 14px 0 20px; }
+  figure img { width: 100%; border: 1px solid var(--line); }
+  figcaption { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .ok { color: var(--ok); font-weight: 600; } .bad { color: var(--bad); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin: 10px 0; }
+  .card { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+  .card b { display:block; font-size: 20px; }
+  .toc a { margin-right: 14px; }
+  @media print { main { max-width: none; } h2 { page-break-before: auto; } figure { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+<main>
+<h1>ДЗ 11. Сервис работает, пользователи ждут</h1>
+<p class="sub">МГТУ · MLOps-26 · работа к лекции 11 · стенд kind на ноутбуке · <b>backend_mode = simulated</b> (CPU-имитатор, настоящая модель не подключалась)</p>
+
+<p class="toc"><a href="#stand">Стенд</a><a href="#A">Опыт A</a><a href="#B">Опыт B</a><a href="#C">Опыт C</a><a href="#metrics">Метрики</a><a href="#checks">Проверки</a><a href="#review">Ревью PR</a><a href="#limits">Ограничения</a></p>
+
+<div class="note">Все задержки в работе — это <b>TTFC</b> (время до первой части ответа) и <b>inter-chunk latency</b> имитатора.
+Термины TTFT, TPOT и tokens/s не используются: фактических токенов модели здесь нет. Числа описывают
+<b>модель нагрузки имитатора</b>, а не настоящий inference engine. Один и тот же backend и один образ
+<code>hw11-sim:0.1.1</code> использовались во всех сравниваемых прогонах.</div>
+
+<h2 id="summary">Итоги</h2>
+<div class="grid">
+<div class="card">Прогрев: запросов на непрогретый Pod<b>16 → 0</b>p95 TTFC 14,5 → 2,7 с (исправлены startup/readiness)</div>
+<div class="card">Rollout A→B под нагрузкой<b>0 5xx · 0 обрывов</b>198/198 ok; потоки 50 и 67 с пережили удаление своих Pod</div>
+<div class="card">ClientIP, 80% через одного клиента<b>p95 14,5 с · 28% 429</b>90% запросов на одну реплику, вторая свободна</div>
+<div class="card">cache-aware router (исправление)<b>p95 3,0 с · 0 отказов</b>50/50 по Pod, доля попаданий в кеш 0,66 (3 прогона × 2 трафика)</div>
+<div class="card">HPA 2→3→2<b>Ready через 23,6 с · вниз через 106 с</b>после снижения нагрузки (окно стабилизации 60 с)</div>
+<div class="card">Горячая реплика при HPA<b>3-й Pod: 0 запросов</b>среднее CPU 119% масштабирует, но ClientIP держит клиентов на старых Pod</div>
+</div>
+<table>
+<tr><th>требование сдачи</th><th>где</th></tr>
+<tr><td>Helm-чарт, Dockerfile, закреплённые зависимости</td><td><code>charts/llm-sim</code>, <code>charts/monitoring</code>, <code>Dockerfile</code>, <code>requirements.lock</code>, <code>pyproject.toml</code>, <code>uv.lock</code></td></tr>
+<tr><td>конфигурации мониторинга, экспорт Grafana</td><td><code>charts/monitoring/templates/*.yaml</code>, <code>results/grafana/dashboard-export.json</code></td></tr>
+<tr><td>собственные проверки</td><td><code>tests/test_k8s.py</code>, <code>tests/test_local.py</code>, журналы <code>results/checks/</code></td></tr>
+<tr><td>инструкция запуска и удаления, версии, лимиты, размер</td><td><code>README.md</code>, раздел 1, <code>results/env/</code></td></tr>
+<tr><td>сырые результаты</td><td><code>results/requests.jsonl</code> и <code>requests.csv</code> (9029 попыток всех опытов), <code>results/exp*/requests-*.jsonl</code></td></tr>
+<tr><td>журналы опытов, HPA/Ready/EndpointSlice</td><td><code>results/exp*/timeline.jsonl</code>, <code>events.jsonl</code>, <code>server-logs/</code>, <code>results/expC/hpa*.txt</code>, <code>results/network/</code></td></tr>
+<tr><td>конфигурации сравниваемых политик</td><td><code>charts/llm-sim/templates/services.yaml</code>, <code>router.yaml</code>, <code>results/expB/services.yaml</code>, <code>helm-values.yaml</code></td></tr>
+<tr><td>четыре графика</td><td><code>results/plots/1-…4-*.png</code> (в разделах 2, 3, 4)</td></tr>
+</table>
+
+<h2 id="stand">1. Стенд</h2>
+<h3>1.1 Окружение, лимиты, размер</h3>
+<table>
+<tr><th>что</th><th>значение</th></tr>
+<tr><td>хост</td><td>Apple M2 Pro, 16 ГБ RAM, macOS 15.3.2</td></tr>
+<tr><td>контейнерное окружение</td><td>OrbStack 1.8.0, Docker 27.3.1; VM: <b>10 CPU, 5,19 ГиБ RAM</b> (зафиксировано до запуска, <code>results/env/versions.txt</code>)</td></tr>
+<tr><td>Kubernetes</td><td>kind v0.33.0, один узел <code>kindest/node:v1.37.0@sha256:a1ed56cf…</code>, containerd 2.3.4, kube-proxy <b>iptables</b>, CNI kindnet</td></tr>
+<tr><td>инструменты</td><td>kubectl 1.37.2, Helm 4.3.2, uv 0.12.10, Python 3.12</td></tr>
+<tr><td>образы (закреплены)</td><td><code>hw11-sim:0.1.1</code> (192 МБ, база <code>python:3.12-slim@sha256:5e2bdb1b…</code>, зависимости <code>requirements.lock</code> с хешами: fastapi 0.163.0, uvicorn 0.54.0, httpx 0.28.1, prometheus-client 0.26.0); <code>prom/prometheus:v3.5.0</code>, <code>grafana/grafana:12.1.1</code>, <code>kube-state-metrics:v2.16.0</code>, <code>metrics-server:v0.8.0</code>. Digest всех образов — в <code>results/env/versions.txt</code></td></tr>
+<tr><td>ресурсы Pod сервиса</td><td>requests 500m CPU / 128 Mi, limits 1 CPU / 256 Mi (факт RSS ≈ 36 Mi)</td></tr>
+<tr><td>хранение метрик</td><td>Prometheus: retention 12 ч и 400 МБ, emptyDir sizeLimit 1 Gi (факт 4,6 МБ); Grafana emptyDir 256 Mi</td></tr>
+<tr><td>backend</td><td><b>simulated</b>: <code>sim.maxConcurrency=2</code>, <code>maxWaiting=16</code> (сверх — 429), prefill 10 мс + 300 мс CPU / 1000 символов непокрытого кешем префикса, 10 мс CPU на часть, LRU-кеш 128 ключей, прогрев 20 с</td></tr>
+<tr><td>генератор</td><td><code>loadgen</code>: пуассоновский поток по seed, 20 пользователей, диалоги по 6 ходов, system-документ 2400 символов + 160 на вопрос, 16–32 части (опыт B); монотонные часы, общий старт по wall clock, запланированное и фактическое время отправки</td></tr>
+<tr><td>фактический размер стенда</td><td>том узла kind 3,8 ГБ (образы в containerd + etcd + журналы), образ узла 0,93 ГБ, образы на хосте ≈ 1,8 ГБ; <b>итого ≈ 6,5 ГБ</b> (<code>results/env/stand-size.txt</code>). Пик памяти узла ≈ 1,6 ГиБ из 5,2</td></tr>
+</table>
+<p><b>Запуск:</b> <code>make up</code> (= <code>scripts/up.sh</code>: kind → сборка образа → <code>kind load</code> → metrics-server →
+<code>helm upgrade --install monitoring</code> → <code>helm upgrade --install sim</code>).
+<b>Удаление:</b> <code>make down</code> (= <code>kind delete cluster --name hw11 &amp;&amp; docker image rm hw11-sim:0.1.1</code>),
+освобождает ≈ 4,8 ГБ. Базовые образы удаляются отдельной командой из README, ещё ≈ 1,7 ГБ.</p>
+
+<h3>1.2 Helm-чарт <code>charts/llm-sim</code></h3>
+<ul>
+<li><b>Deployment</b> <code>llm-sim</code>: 2 реплики, <code>RollingUpdate maxSurge 1 / maxUnavailable 0</code>, ресурсы выше. Под PID 1 работает tini
+(в чарте <code>args</code>, а не <code>command</code>, чтобы не перекрыть ENTRYPOINT). preStop <code>/drain</code>, <code>terminationGracePeriodSeconds 70</code>.</li>
+<li><b>ConfigMap</b> <code>llm-sim-config</code>: версия, файл и sha256 модели, прогрев, параметры имитатора. Checksum ConfigMap в аннотации
+шаблона: изменение values = rollout.</li>
+<li><b>Values</b>: <code>image.tag</code>, <code>model.version/file/sha256</code>, <code>warmupSeconds</code>, <code>replicaCount</code>,
+<code>probes.mode</code>, <code>hpa.*</code>. Варианты: <code>values-B.yaml</code>, <code>values-B-broken.yaml</code>,
+<code>values-naive-probes.yaml</code>, <code>values-hpa.yaml</code>.</li>
+<li><b>Service</b> <code>llm-sim</code> (sessionAffinity: None) и <code>llm-sim-clientip</code> (ClientIP, 10800 с) над теми же Pod;
+<code>llm-router</code> (cache-aware маршрутизатор с RBAC на чтение EndpointSlice); StatefulSet <code>loadclient</code> — 4 клиентских Pod с разными IP;
+HPA (опыт C).</li>
+</ul>
+
+<h3>1.3 Версия артефакта</h3>
+<p>Источник — файл модели-имитатора внутри неизменяемого образа (<code>models/model-A.json</code>, <code>model-B.json</code>; JSON со
+словарём ответа и префиксом версии). Ожидаемый sha256 закреплён в values и попадает в ConfigMap. При старте backend
+пересчитывает хеш (<code>app/artifact.py</code>, перенесено из <code>release.verify_files</code> ДЗ 8+9+10) и сверяет версию.
+При несовпадении Pod жив, но <code>/startup</code> не отвечает 200, и в трафик Pod не попадает (опыт A, 2.3). Каждый ответ несёт
+<code>model_version</code>, <code>model_sha256</code>, <code>pod</code>, <code>backend_mode</code>. Восстановление той же версии после замены Pod
+проверяет <code>test_3</code>: на новом Pod <code>/version</code> показывает тот же sha256.
+Для настоящих весов файл в образе не годится: нужен общий для всех реплик источник. Подойдёт том ReadOnlyMany (NFS/CSI)
+с учётом размещения Pod по узлам, либо объектное хранилище с проверкой хеша при загрузке в локальный кеш узла.
+ReadWriteOnce-том к нескольким репликам на разных узлах не подключится.</p>
+
+<h3>1.4 Связь ответов и журналов</h3>
+<p>Клиент присылает <code>X-Request-ID</code> (или его генерирует сервис). Заголовки ответа: <code>X-Request-ID, X-Pod, X-Model-Version, X-Backend-Mode</code>.
+Первая строка потока — <code>meta</code> (pod, версия, sha256, очередь, кеш), последняя — <code>done</code>. Журнал сервиса — одна JSON-строка
+на запрос: <code>request_id, session_id, peer_ip, pod, model_version, model_sha256, warm_at_receive, queue_s, cache, ttfc_s, duration_s, outcome</code>.
+<b>История диалога</b> передаётся в запросе (<code>messages</code>), в Pod хранится только кеш префикса, который можно потерять.
+Продолжение диалога после удаления отвечавшего Pod проверяет <code>test_3</code>.</p>
+
+<h3>1.5 Мониторинг (<code>charts/monitoring</code>)</h3>
+<p>Prometheus v3.5.0 собирает метрики: (1) <b>с каждого Pod</b> через <code>kubernetes_sd_configs role: pod</code> по аннотации
+<code>prometheus.io/scrape</code>, метки <code>pod</code>, <code>app</code>, <code>version</code>; (2) CPU/RAM контейнеров из cAdvisor через proxy API-сервера,
+только namespace <code>llm</code>; (3) kube-state-metrics (Ready-реплики, HPA). Интервал 5 с, правила алертов — в том же ConfigMap.
+Grafana 12.1.1 получает datasource и дашборд через provisioning. Исходник дашборда —
+<code>charts/monitoring/files/llm-sim-dashboard.json</code> (генерирует <code>scripts/gen_dashboard.py</code>), экспорт из работающей Grafana
+через API — <code>results/grafana/dashboard-export.json</code>.</p>
+
+<h2 id="A">2. Опыт A. Прогрев, обновление и откат</h2>
+<p><b>Условия для всех частей:</b> прогрев 20 с; нагрузка 1,2 запр/с по детерминированному расписанию
+(<code>loadgen.schedule</code>, seed 7, ответы по 8–16 частей); 4 клиентских Pod; обычный Service <code>llm-sim</code>.
+Клиенты открывают <b>новое соединение на каждый запрос</b> (<code>--no-keepalive</code>), как за L7-балансировщиком,
+который распределяет каждый запрос. Наблюдатель каждые 0,5 с пишет Pod/Ready/EndpointSlice
+(<code>timeline.jsonl</code>), журналы всех Pod сохраняются (<code>server-logs/</code>).
+Сценарии: <code>scripts/exp_a.py warm-naive|warm-fixed|rollout|broken|kill</code>. Сводка по сырым данным:
+<code>analysis/expa_stats.py</code> → <code>results/tables/expA.json</code>.</p>
+
+<h3>2.1 Прогрев: исходный дефект и исправление</h3>
+<p><b>Гипотеза.</b> Если startup и readiness проверяют только то, что HTTP-процесс поднялся (<code>/health</code>),
+новый Pod попадает в EndpointSlice за секунды. Весь прогрев (20 с) он принимает рабочие запросы, и они ждут конца прогрева.</p>
+<p><b>Воспроизведение.</b> Под нагрузкой на 21-й секунде удаляется один из двух прогретых Pod
+(<code>kubectl delete pod</code>), Deployment создаёт замену. Время ниже отсчитывается от удаления.</p>
+<table>
+<tr><th>Момент, с от удаления</th><th>исходный дефект<br><code>values-naive-probes.yaml</code></th><th>исправление<br>(<code>values.yaml</code>, probes: fixed)</th></tr>
+<tr><td>Pod создан / начат прогрев</td><td class="n">−0,2 / 3,0</td><td class="n">0,0 / 2,2</td></tr>
+<tr><td>Pod Ready = True и в Ready-адресах EndpointSlice</td><td class="n bad">4,3</td><td class="n ok">23,2</td></tr>
+<tr><td>прогрев завершён (<code>warmup_done</code> в журнале Pod)</td><td class="n">23,1</td><td class="n">22,2</td></tr>
+<tr><td>первый рабочий запрос на новый Pod</td><td class="n bad">5,8</td><td class="n ok">23,2</td></tr>
+<tr><td>запросов принято непрогретым backend (<code>warm_at_receive=false</code>)</td><td class="n bad">16 из 55</td><td class="n ok">0 из 37</td></tr>
+<tr><td>TTFC этих запросов</td><td class="n bad">11,4–19,3 с</td><td class="n">—</td></tr>
+<tr><td>весь прогон: попыток / ok / TTFC p50 / p95</td><td class="n">133 / 133 / 0,90 / <b>14,5 с</b></td><td class="n">133 / 133 / 1,12 / <b>2,7 с</b></td></tr>
+</table>
+<p><b>Причина.</b> В naive-режиме у <code>startupProbe</code> и <code>readinessProbe</code> путь <code>/health</code>. Он отвечает 200,
+как только запущен uvicorn, а прогрев идёт в фоновом потоке. Kubernetes считает Pod готовым, EndpointSlice публикует
+адрес, kube-proxy отправляет на него новые соединения. Запросы встают в ожидание <code>warm_event</code>.</p>
+<p><b>Изменение.</b> У проверок разные назначения:</p>
+<table>
+<tr><th>probe</th><th>путь</th><th>что означает</th><th>тайм-ауты</th></tr>
+<tr><td>startup</td><td><code>/startup</code></td><td>артефакт проверен по sha256 и прогрев завершён (один раз за жизнь процесса); пока нет — liveness/readiness не выполняются</td><td>period 2 с × failureThreshold 30 = <b>60 с</b> ≥ 3× прогрева 20 с; timeout 2 с</td></tr>
+<tr><td>readiness</td><td><code>/ready</code></td><td>прогрет <i>и</i> не в режиме drain: можно давать рабочий трафик</td><td>period 2 с, failureThreshold 2 → снятие ≤ 4 с</td></tr>
+<tr><td>liveness</td><td><code>/health</code></td><td>процесс и цикл событий живы, обработка не зависла дольше 60 с; от прогрева не зависит, чтобы долгий прогрев не вызывал перезапусков</td><td>period 10 с × 3, timeout 3 с</td></tr>
+</table>
+<p><b>Повтор.</b> Тот же сценарий и то же расписание: новый Pod стал Ready через 1 с после конца прогрева
+и не получил ни одного запроса до него. p95 TTFC упал с 14,5 до 2,7 с. Оставшиеся 2–4 с — время, пока одна реплика
+обслуживает весь поток с холодным кешем.</p>
+<p><b>Если оставить keep-alive</b> (<code>results/expA/warm-naive-keepalive</code>, первая попытка, 3 запр/с), дефект проявляется
+слабее и позже: kube-proxy выбирает Pod только при новом TCP-соединении, поэтому новый Pod получил 5 непрогретых запросов,
+и не сразу, а после того как у клиентов истекли простаивающие соединения. Keep-alive не исправляет дефект, а прячет его в зависимость от поведения клиентов.</p>
+
+<figure><img src="results/plots/1-warmup-rollout-ready.png" alt="Опыт A: TTFC и Ready во времени">
+<figcaption>График 1. Опыт A: TTFC каждого запроса по Pod (точки, лог-шкала, с) и число Ready-адресов в EndpointSlice
+(линии, правая ось) по времени от начала нагрузки. Красные кружки — запросы, принятые непрогретым backend.
+Условия: 2 реплики, прогрев 20 с, 1,2 запр/с, соединение на запрос. Сырьё: <code>results/expA/*/timeline.jsonl</code>, <code>requests-*.jsonl</code>.</figcaption></figure>
+
+<h3>2.2 Rolling update A → B под нагрузкой с длительными потоками</h3>
+<p>Стратегия <code>maxSurge: 1, maxUnavailable: 0</code>. При завершении Pod срабатывает <code>preStop: GET /drain</code>:
+Pod переходит в drain, <code>/ready</code> начинает отвечать 503, ответы получают <code>Connection: close</code>, затем 6 с ожидания,
+пока адрес уйдёт из EndpointSlice. После этого приходит SIGTERM (через tini, PID 1), и uvicorn ждёт активные ответы до 50 с.
+<code>terminationGracePeriodSeconds: 70</code> больше суммы 6 + 50 с с запасом. До начала обновления запущены два длительных потока:
+2800 частей (≈50 с) и 4200 частей (≈67 с). Отсчёт — от <code>helm upgrade -f values-B.yaml</code>.</p>
+<table>
+<tr><th>Pod</th><th>версия</th><th>Ready</th><th>удаление / drain</th><th>активных при drain</th><th>вне EndpointSlice</th><th>процесс завершён</th></tr>
+<tr><td>…c4xnm</td><td>B</td><td class="n">27,5</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>…zrvhd</td><td>A</td><td class="n">до начала</td><td class="n">27,5 / 26,7</td><td class="n">2 (в т.ч. поток 2800)</td><td class="n">27,5</td><td class="n">41,0</td></tr>
+<tr><td>…rsjtg</td><td>B</td><td class="n">52,5</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>…mlssj</td><td>A</td><td class="n">до начала</td><td class="n">52,5 / 52,2</td><td class="n">2 (в т.ч. поток 4200)</td><td class="n">52,5</td><td class="n">60,4</td></tr>
+</table>
+<p>Поток 2800 частей на <code>zrvhd</code> завершился на 40,9 с, процесс остановился на 41,0 с. Поток 4200 частей на
+<code>mlssj</code> завершился на 60,3 с, процесс остановился на 60,4 с. Оба получили все части и строку <code>done</code>.
+<b>Итог полного прогона: 198 попыток, 198 ok, 0 HTTP 5xx, 0 оборванных потоков, 0 тайм-аутов</b>
+(80 ответов версии A, 118 версии B). Новая версия получала трафик только после прогрева (Ready через 26,4 с после создания).</p>
+
+<h3>2.3 Заведомо неготовая B и откат</h3>
+<p><code>values-B-broken.yaml</code>: в B закреплён неверный sha256. Новый Pod <code>…mhkfx</code> пишет
+<code>load_failed: ValueError: sha256 артефакта model-B.json = 30db7df5ad0e…, ожидался 0…</code>, <code>/startup</code> никогда не
+отвечает 200. За 70 с Pod <b>ни разу не стал Ready и не попал в EndpointSlice</b>. Startup probe исчерпала 60 с, и kubelet один
+раз перезапустил контейнер. Из-за <code>maxUnavailable: 0</code> старые Pod A не удалялись, rollout завис.
+Все 98 ответов в этом интервале — версия A. На 70-й секунде выполнен <code>helm rollback sim 16</code>
+(история: rev 17 — B-broken, rev 18 — «Rollback to 16»), неготовый Pod удалён через 9 с.
+<b>После отката все 72 фактических ответа — <code>model_version=A</code>, sha256 <code>f5518680fa9a…</code>.</b>
+Прогон: 196 попыток, 196 ok.</p>
+
+<h3>2.4 Принудительное завершение процесса (kill -9)</h3>
+<p>Под нагрузкой (1,2 запр/с и три длительных потока по 600 частей) выполнено
+<code>kubectl exec … -- sh -c 'kill -9 $(cat /tmp/app.pid)'</code>: процесс сервиса убит без drain. Клиент делает
+<b>один повтор</b>, и каждый повтор записан как отдельная попытка (<code>attempt=1</code>).</p>
+<table>
+<tr><th>показатель</th><th>значение</th></tr>
+<tr><td>оборвано потоков на убитом Pod (200, но без <code>done</code>)</td><td class="n">2; длительный поток получил 306 из 600 частей, его повтор на другом Pod — ok</td></tr>
+<tr><td>ошибки соединения (запрос не начат)</td><td class="n">3 (2 первые попытки + 1 повтор)</td></tr>
+<tr><td>обнаружение отказа: Pod исчез из Ready-адресов EndpointSlice</td><td class="n">через 1,4 с</td></tr>
+<tr><td>восстановление: контейнер перезапущен (restartCount 1), прогрет, снова Ready</td><td class="n">через 24,8 с</td></tr>
+<tr><td>отказы 429 на оставшейся реплике, пока вторая прогревалась</td><td class="n">34 попытки (18 первых + 16 повторов)</td></tr>
+<tr><td>логических запросов / завершились ok (с учётом повторов)</td><td class="n">139 / 122; попыток 161</td></tr>
+</table>
+<p>Вывод: rollout корректен только при плановом завершении. При падении процесса активные потоки теряются, это и есть
+граница graceful shutdown. Немедленный повтор после 429 попадает в ту же перегруженную реплику (16 из 22 повторов
+снова получили 429): <b>повторы усиливают давление</b>, нужны backoff и <code>Retry-After</code>.</p>
+<p><b>Оставшиеся ограничения.</b> Один узел kind: нет сетевых задержек между узлами, при потере узла сработает другой
+механизм. Grace period 70 с выбран под потоки до ~60 с; более длинный поток при плановом выводе будет оборван.
+<code>kill -9</code> дал 1 перезапуск; сценарий OOMKilled отдельно не проверялся.</p>
+
+<h2 id="B">3. Опыт B. Привязка к Pod и горячая реплика</h2>
+<p><b>Гипотеза.</b> Привязка по IP клиента направляет весь трафик «тяжёлого» клиента в одну реплику. Средняя загрузка двух
+реплик остаётся приемлемой, но у горячей растут очередь и TTFC, вплоть до 429, а у второй есть свободная ёмкость.</p>
+
+<h3>3.1 Сеть и что видит механизм привязки</h3>
+<ul>
+<li>kube-proxy <b>iptables</b>. У <code>llm-sim-clientip</code> на каждый endpoint есть правило <code>-m recent --rcheck --seconds 10800 --rsource</code>.
+Первое соединение с нового IP выбирает endpoint случайно (<code>statistic --probability 0.5</code>), и IP запоминается в таблице
+<code>xt_recent</code> этого endpoint (<code>results/network/affinity-state-expB.txt</code>).</li>
+<li>Механизм видит <b>IP клиентского Pod</b> (10.244.0.21/.23/.24/.25): трафик Pod→ClusterIP внутри CIDR кластера не маскарадится
+(MASQ только для <code>! -s 10.244.0.0/16</code>). Этот же IP записан в журнале сервиса как <code>peer_ip</code>.</li>
+<li>Во время опыта таблица привязки: клиенты 0, 2, 3 (10.244.0.25/.23/.21) → Pod <code>…4nvcw</code>, клиент 1 (10.244.0.24) → <code>…2t2t5</code>.
+Привязка держится 3 ч, поэтому она одинакова во всех трёх повторах. В первой попытке (до перезапуска опыта) все 4 клиента
+попали на один Pod (<code>affinity-state-first-attempt.txt</code>), то есть исход случаен и задаётся первым соединением.</li>
+<li>Клиенты используют <b>HTTP keep-alive</b> (пул httpx до 32 соединений, простой 5 с). Даже у обычного Service выбор Pod
+происходит <b>на соединение, а не на запрос</b>: распределение зависит от числа одновременно открытых соединений.</li>
+</ul>
+
+<h3>3.2 Постановка (одинакова для всех политик)</h3>
+<ul>
+<li>Одни и те же 2 реплики, один образ и values. Политики: <b>Service (None)</b> → <code>llm-sim</code>; <b>Service ClientIP</b> → <code>llm-sim-clientip</code>;
+<b>cache-aware router</b> → <code>llm-router</code> (исправление).</li>
+<li>Трафик: <b>uniform</b> — 20 пользователей поровну на 4 клиентских Pod; <b>skew80</b> — 16 из 20 пользователей у клиента 0
+(≈ 80% запросов). Для данного повтора и вида трафика <b>одно и то же расписание</b> (<code>results/expB/schedule-*.json</code>:
+запросы, длины входов, <code>max_chunks</code> 16–32, моменты отправки) получают все три политики. Порядок политик внутри повтора
+сдвигается по кругу. Повторы r1–r3 используют seed 101–103.</li>
+<li>Интенсивность 2,5 запр/с (пуассоновский поток). Явное начальное состояние: <code>POST /admin/reset-cache</code> на обоих Pod перед
+каждым прогоном, затем 30 с warmup (не входят в метрики) и <b>120 с измерения</b>. Запланированное и фактическое время отправки
+сохранены: p95 отставания генератора ≤ 12 мс.</li>
+<li><b>Имитация префиксного кеша</b> (явно обозначена, <code>app/backend.py</code>): LRU на 128 ключей на Pod; ключ — sha256 префикса на
+каждой границе сообщения. Cache miss стоит 10 мс + 300 мс CPU на 1000 непокрытых символов (новый диалог ≈ 2600 символов,
+<b>≈ 0,8 с</b>). Cache hit — только новые ≈ 240 символов, ≈ 0,08 с. Плюс 10 мс CPU на каждую из 16–32 частей.
+Одновременно обрабатывается 2 запроса на Pod, в очереди до 16, сверх — 429. Числа относятся к модели нагрузки имитатора.</li>
+</ul>
+
+<h3>3.3 Результаты: 3 политики × 2 трафика × 3 прогона</h3>
+<table>
+<tr><th>политика</th><th>трафик</th><th>TTFC p50, с<br>среднее [мин–макс]</th><th>TTFC p95, с</th><th>полный ответ p95, с</th><th>доля 429</th><th>доля cache hit</th><th>доля запросов на самый загруженный Pod</th><th>ok / попыток (r1, r2, r3)</th></tr>
+<tr><td>Service (None)</td><td>uniform</td><td class="n">1,73 [0,81–2,68]</td><td class="n">4,99 [2,98–6,84]</td><td class="n">5,51</td><td class="n">0</td><td class="n">0,61</td><td class="n">0,55</td><td class="n">291/291, 263/263, 299/299</td></tr>
+<tr><td>Service ClientIP</td><td>uniform</td><td class="n bad">3,75 [1,81–6,43]</td><td class="n bad">8,57 [4,99–10,61]</td><td class="n">9,04</td><td class="n">0,037</td><td class="n">0,74</td><td class="n bad">0,75</td><td class="n">275/291, 263/263, 282/299</td></tr>
+<tr><td>cache-aware router</td><td>uniform</td><td class="n ok">0,64 [0,32–0,85]</td><td class="n ok">3,00 [2,16–3,68]</td><td class="n">3,50</td><td class="n ok">0</td><td class="n">0,67</td><td class="n">0,51</td><td class="n">291/291, 263/263, 299/299</td></tr>
+<tr><td>Service (None)</td><td>skew80</td><td class="n">2,66 [1,30–3,90]</td><td class="n">8,03 [4,00–10,11]</td><td class="n">8,55</td><td class="n">0,003</td><td class="n">0,57</td><td class="n">0,56</td><td class="n">288/291, 263/263, 299/299</td></tr>
+<tr><td>Service ClientIP</td><td>skew80</td><td class="n bad">10,54 [9,61–11,24]</td><td class="n bad">14,46 [13,43–15,33]</td><td class="n">14,96</td><td class="n bad">0,277</td><td class="n">0,64</td><td class="n bad">0,90</td><td class="n">215/291, 203/263, 197/299</td></tr>
+<tr><td>cache-aware router</td><td>skew80</td><td class="n ok">0,81 [0,31–1,31]</td><td class="n ok">3,00 [2,18–3,74]</td><td class="n">3,55</td><td class="n ok">0</td><td class="n">0,66</td><td class="n">0,51</td><td class="n">291/291, 263/263, 299/299</td></tr>
+</table>
+<p>Тайм-аутов (30 с), 5xx и оборванных потоков не было ни в одном прогоне; все отказы — 429 из-за полной очереди. Перцентили
+посчитаны только по успешным ответам, число наблюдений — в последнем столбце. По прогонам:
+<code>results/tables/expB-runs.json</code> (распределение по Pod, клиент→Pod, очередь), сырьё — <code>results/expB/requests-*.jsonl</code>.</p>
+
+<figure><img src="results/plots/3-policies-3runs.png" alt="Сравнение политик"><figcaption>График 3. Сравнение политик по трём прогонам:
+TTFC p50 и p95 (с, лог-шкала), доля отказов 429, доля запросов на самый загруженный Pod. Точки — отдельные прогоны, столбцы — среднее.
+Условия в подписи графика.</figcaption></figure>
+
+<h3>3.4 Горячая реплика ждёт, у другой свободная ёмкость</h3>
+<p>Прогон <code>B-clientip-skew80-r1</code>. Pod <code>…4nvcw</code> получил 90% запросов: очередь 8–13 с, TTFC p95 13,4 с, 76 отказов 429.
+Pod <code>…2t2t5</code> получил 10%: ожидание слота ≈ 0, TTFC p95 0,84 с, при этом его CPU простаивал. При равномерном трафике
+(<code>B-clientip-uniform-r1</code>) привязка 3:1 даёт ту же картину: 73% / 27%, p95 11,3 с против 1,7 с, 16 отказов на горячей реплике.
+Суммарной ёмкости двух реплик (≈ 2 запр/с каждая по калибровке) на 2,5 запр/с хватает: по средней загрузке перегрузки не видно.</p>
+<figure><img src="results/plots/2-latency-queue-per-pod.png" alt="Задержка и очередь по Pod"><figcaption>График 2. Повтор r1, трафик 80% через клиента 0:
+TTFC каждого запроса (с, лог-шкала) и ожидание слота на Pod (с, из строки <code>meta</code>) по репликам и времени.
+Красные крестики — 429. Слева направо: обычный Service, ClientIP, cache-aware router.</figcaption></figure>
+
+<h3>3.5 Где ожидаемый перекос не возник</h3>
+<p><b>Обычный Service при skew80</b> (<code>B-default-skew80-*</code>): 80% запросов идут через клиента 0, но доли реплик 52–59%, а не 80/20.
+Трасса запросов показывает, что клиент 0 разошёлся по обеим репликам (r1: 145 запросов на <code>…2t2t5</code> и 89 на <code>…4nvcw</code>).
+Он держит несколько keep-alive соединений одновременно (до 32 в пуле, параллельные потоки), каждое новое соединение kube-proxy
+направляет случайно, а простаивающие соединения истекают через 5 с и открываются заново. Перекос по клиенту не превращается
+в перекос по Pod. Цена — локальность: доля cache hit 0,57 против 0,66–0,74, потому что ходы диалога попадают на разные реплики
+и платят полный промах. Остаточный дисбаланс 58/42 в r1 к концу прогона дал очередь до 11 с на одной реплике (график 2, слева).
+Соединения распределяются случайно, а не по загрузке.</p>
+<p><b>ClientIP при uniform</b> мог дать и 2:2 — тогда перекоса бы не было. Здесь выпало 3:1, а в первой попытке 4:0. Исход определяется
+первым соединением каждого клиента и держится 3 ч. Поэтому ClientIP ведёт себя по-разному на разных запусках: это недетерминированная
+конфигурация, а не политика балансировки.</p>
+
+<h3>3.6 Исправление и его защита</h3>
+<p>Выбран <b>маршрутизатор с политикой cache-aware + bounded load</b> (<code>app/router.py</code>, Service <code>llm-router</code>).
+Подход тот же, что у cache_aware router SGLang Model Gateway и prefix-aware scoring в Gateway API Inference Extension из лекции.</p>
+<ul>
+<li>Ключ привязки — <code>session_id</code> диалога, а не IP. Pod выбирается rendezvous-хешем из Ready-адресов EndpointSlice
+(читаются из API каждую секунду, без 30-секундного кеша DNS). Пользователи «тяжёлого» клиента распределяются по репликам,
+но каждый диалог остаётся на одной реплике и попадает в свой префикс.</li>
+<li>Если у предпочтительной реплики в работе на ≥ 2 запроса больше, чем у наименее загруженной (<code>BALANCE_THRESHOLD=2</code>),
+запрос уходит на наименее загруженную. Один промах (≈ 0,8 с) дешевле ожидания в очереди, где каждый запрос ≈ 0,3–0,5 с.
+Решения: ≈ 83–87% <code>affinity</code>, 13–17% <code>overflow</code> (заголовок <code>X-Route-Reason</code>).</li>
+<li>Маршрутизация на каждый запрос: keep-alive клиента к маршрутизатору не закрепляет клиента за Pod.</li>
+</ul>
+<p><b>Результат повтора на тех же расписаниях:</b> TTFC p50 0,64–0,81 с, p95 3,0 с в обоих видах трафика, 0 отказов во всех 6 прогонах,
+распределение 50/50 ± 1,5%. Доля cache hit 0,66–0,67 — выше, чем у обычного Service (0,57–0,61), и ниже, чем у ClientIP (0,64–0,74).
+ClientIP получает лучшую локальность ценой очереди на одной реплике. Против ClientIP при skew80: p95 ниже в 4,8 раза, отказов
+0 вместо 28%. Против обычного Service: p95 ниже в 1,7–2,7 раза при той же нагрузке.</p>
+<p><b>Что потребует проверки на настоящем inference engine:</b> реальная доля попаданий по метрикам engine (у vLLM/SGLang кеш блочный, а вытеснение
+зависит от KV-памяти и батча); сигнал загрузки — очередь и KV-утилизация engine, а не счётчик маршрутизатора; порог перехода
+в TTFT, а не в числе запросов; несколько реплик маршрутизатора и согласованность их оценок; влияние continuous batching, при котором
+«2 в работе» и «16 в работе» стоят по-разному.</p>
+
+<h2 id="C">4. Опыт C. HPA и мониторинг</h2>
+<h3>4.1 Конфигурация и условия HPA</h3>
+<ul>
+<li>Resource metrics API доступен: <code>v1beta1.metrics.k8s.io</code> (metrics-server v0.8.0, <code>--kubelet-insecure-tls</code> для kind) — <code>AVAILABLE True</code>.
+<code>requests.cpu = 500m</code> у единственного контейнера <code>sim</code> (<code>results/expC/metrics-api-check.txt</code>).</li>
+<li><code>autoscaling/v2</code>, <code>minReplicas 2</code>, <code>maxReplicas 3</code>, метрика <code>Resource cpu</code>, цель <b>averageUtilization 60%</b>
+(= 300m в среднем на Pod). <code>behavior.scaleUp</code>: окно стабилизации 0 с, не более 1 Pod за 15 с; <code>scaleDown</code>: окно стабилизации
+<b>60 с</b> (по умолчанию 300 с; уменьшено, чтобы уложиться в опыт), не более 1 Pod за 15 с. Файлы: <code>charts/llm-sim/templates/hpa.yaml</code>,
+<code>values-hpa.yaml</code>, снимки <code>results/expC/hpa.yaml</code>, <code>hpa-describe.txt</code>.</li>
+<li>Нагрузка вычислительная: prefill и части ответа тратят CPU-время потока (<code>burn_cpu</code> по <code>time.thread_time()</code>), поэтому
+рост CPU виден cAdvisor и metrics-server.</li>
+</ul>
+
+<h3>4.2 Масштабирование 2 → 3 → 2 (равномерный трафик через Service <code>llm-sim</code>)</h3>
+<p>Профиль: 0–30 с — 1 запр/с, 30–270 с — 4,5 запр/с, 270–570 с — 0,5 запр/с. Время отсчитывается от начала нагрузки.</p>
+<table>
+<tr><th>событие</th><th>t, с</th><th>комментарий</th></tr>
+<tr><td>HPA desired 2 → 3</td><td class="n">30,3</td><td>средняя CPU 94% от requests при цели 60%</td></tr>
+<tr><td>новый Pod <code>…pk568</code> создан</td><td class="n">29,6</td><td><code>creationTimestamp</code> с точностью до секунды</td></tr>
+<tr><td>новый Pod Ready (startupProbe дождалась прогрева) и в EndpointSlice</td><td class="n">53,2</td><td><b>23,6 с</b> от создания, из них 20 с прогрев</td></tr>
+<tr><td>пик средней CPU</td><td class="n">195%</td><td>все три реплики упираются в limit 1 CPU</td></tr>
+<tr><td>снижение нагрузки до 0,5 запр/с</td><td class="n">270</td><td></td></tr>
+<tr><td>HPA desired 3 → 2</td><td class="n">376,1</td><td><b>фактически 106 с</b> после снижения: окно стабилизации 60 с + задержка метрик (окно metrics-server ≈ 15–30 с) + период HPA 15 с</td></tr>
+<tr><td>Pod <code>…pk568</code> удалён (drain + завершение)</td><td class="n">384,3</td><td>возврат к минимуму 2</td></tr>
+</table>
+<p>4,5 запр/с сознательно выше ёмкости даже трёх реплик: нужно было увидеть упор в <code>maxReplicas</code> и сработку алертов.
+Поэтому 355 из 1248 попыток получили 429. Новая реплика за время работы получила <b>164 запроса против 680 и 404</b> у старых:
+клиенты держат keep-alive соединения, а kube-proxy отправляет на новый Pod только новые соединения.</p>
+<figure><img src="results/plots/4-hpa-2-3-2.png" alt="HPA 2-3-2"><figcaption>График 4. Масштабирование 2 → 3 → 2 вместе с нагрузкой: HPA desired,
+число Pod и Ready-адресов EndpointSlice, средняя CPU в % от requests (цель 60%, пунктир); запланированные и завершённые запр/с (окна 10 с);
+TTFC по Pod (с, лог-шкала). Сырьё: <code>results/expC/timeline.jsonl</code>, <code>requests-C-scale.jsonl</code>, <code>prometheus-range.json</code>.</figcaption></figure>
+
+<h3>4.3 Горячая реплика повторно (ClientIP, 80% через клиента 0, HPA включён)</h3>
+<p><code>scripts/exp_c.py hot</code>: 2,5 запр/с в течение 200 с через <code>llm-sim-clientip</code>. HPA перешёл 2 → 3 на 30,4 с при <b>средней</b> CPU 119%.
+Горячая реплика упиралась в limit (≈ 200% от requests), холодная была почти свободна, и среднее ушло выше 60%. Новый Pod
+<code>…4wwmc</code> стал Ready на 55,0 с и <b>не получил ни одного запроса</b>: распределение 459 / 45 / 0. Отказов 150 из 504 (30%), TTFC p95 14,3 с.
+Масштабирование ничего не исправило.</p>
+<p><b>Когда средняя CPU вызывает масштабирование.</b> HPA считает <code>desired = ceil(current × avg(utilization) / target)</code> по
+<b>среднему</b> всех Pod. Одна горячая реплика при пустой второй поднимает среднее выше цели, только если она одна «весит»
+больше, чем 2 × 60% = 120% от requests. В нашем случае limit 1 CPU = 200% от requests, поэтому масштабирование случилось. С limit,
+близким к request, или с тремя и более репликами одна горячая реплика среднее не сдвинет, и HPA ничего не заметит.
+<b>Почему новая реплика получает мало запросов:</b> привязка ClientIP хранится в <code>xt_recent</code> 3 ч, и на новый endpoint попадут только
+новые IP клиентов. Keep-alive у обычного Service даёт тот же эффект слабее: новый Pod получает только новые соединения (опыт 4.2, 164 запроса).
+Поэтому масштабирование надо дополнять маршрутизацией по загрузке (опыт B) и сигналом по очереди или задержке на каждом Pod, а не по средней CPU.</p>
+
+<h3>4.4 Два алерта</h3>
+<pre># charts/monitoring/templates/prometheus.yaml (правила вычисляются каждые 5 с)
+SimHighTTFC:  histogram_quantile(0.95, sum by (le) (rate(sim_ttfc_seconds_bucket[1m]))) &gt; 2
+              and on() sum(increase(sim_ttfc_seconds_count[1m])) &gt;= 20          for: 30s
+SimHighErrorRatio: sum(rate(sim_requests_total{outcome!="ok"}[1m])) / sum(rate(sim_requests_total[1m])) &gt; 0.05
+              and on() sum(increase(sim_requests_total[1m])) &gt;= 20             for: 30s</pre>
+<p>Порог задержки — p95 TTFC 2 с. Минимальный объём наблюдений — 20 ответов в окне 1 мин, чтобы один медленный запрос при
+малом трафике не поднимал алерт. Период удержания — 30 с. Отказы (429, 503) и оборванные потоки входят в долю ошибок.
+Переходы, снятые опросом <code>/api/v1/alerts</code> каждые 2 с (<code>results/expC/events.jsonl</code>), и ряд <code>ALERTS</code> из query_range
+(<code>prometheus-range.json</code>) за опыт 4.2:</p>
+<table>
+<tr><th>t, с</th><th>SimHighTTFC</th><th>SimHighErrorRatio</th></tr>
+<tr><td class="n">41,9</td><td>inactive → <b>pending</b></td><td></td></tr>
+<tr><td class="n">66,7</td><td></td><td>inactive → <b>pending</b></td></tr>
+<tr><td class="n">70,7</td><td>pending → <b class="bad">firing</b> (через 28,8 с)</td><td></td></tr>
+<tr><td class="n">95,4</td><td></td><td>pending → <b class="bad">firing</b> (через 28,7 с)</td></tr>
+<tr><td class="n">331,5</td><td></td><td>firing → <b class="ok">inactive</b> (61 с после снижения нагрузки)</td></tr>
+<tr><td class="n">351,7</td><td>firing → <b class="ok">inactive</b></td><td></td></tr>
+<tr><td class="n">410,0 → 420,2</td><td>pending → inactive (кратковременный всплеск не продержался 30 с, алерта нет)</td><td></td></tr>
+</table>
+<p>Время pending → firing ≈ 29 с, а не ровно 30: состояние опрашивалось раз в 2 с, правила вычисляются раз в 5 с. В опыте 4.3 алерты
+перешли в firing на 48,5 с и 83,0 с и вернулись в норму после окончания нагрузки (257,6 и 263,6 с).</p>
+
+<h2 id="metrics">5. Что и как измерялось</h2>
+<h3>5.1 Клиентский журнал (сырьё: <code>results/requests.jsonl</code>, <code>results/requests.csv</code>)</h3>
+<p>Каждая <b>попытка</b> — одна строка: <code>run, id, attempt, request_id, session, turn, phase, client, client_pod, max_chunks, prompt_chars,
+scheduled_wall, send_wall, send_lag_s, status, outcome, error, pod, model_version, model_sha256, backend_mode, route_reason, cache,
+queue_s, warm_at_receive, ttfc_s, inter_chunk_mean_s, duration_s, done_wall, chunks, got_done</code>.
+Длительности считаются по <code>time.monotonic()</code> клиента от момента отправки:</p>
+<ul>
+<li><b>TTFC</b> = t(первая строка <code>chunk</code>) − t(отправка). Строка <code>meta</code> содержательной частью не считается.</li>
+<li><b>inter-chunk latency</b> (среднее) = (t(последняя часть) − t(первая часть)) / (N − 1), только для завершённых ответов с N ≥ 2;
+при N = 1 значение отсутствует. Распределение интервалов на сервере — гистограмма <code>sim_inter_chunk_seconds</code>.</li>
+<li><b>send_lag_s</b> = фактическая − запланированная отправка, отставание самого генератора. Во всех прогонах опыта B p95 ≤ 12 мс, максимум ≤ 0,04 с,
+то есть генератор успевал. В опыте A (kill) максимум 7,6 с — это повторы, отправленные после неудачной первой попытки.</li>
+</ul>
+<p><b>Учёт исходов</b> (<code>loadgen.client.classify</code>, проверка <code>test_4</code>): <code>ok</code> — 200 и строка <code>done</code> с полным числом частей;
+<code>rejected</code> — 429 (очередь полна); <code>http_5xx</code>; <code>aborted</code> — 200, но поток оборван до <code>done</code>;
+<code>timeout</code> — превышено время попытки (30 с); <code>conn_error</code> — запрос не начат. Сводка считает отдельно:
+<i>запланировано</i> (строки расписания), <i>отправлено</i> (попытки), <i>завершено</i> (ok), отклонено, оборвано, просрочено.
+Повторы — отдельные попытки с <code>attempt ≥ 1</code>, логический успех считается по <code>id</code>.
+Перцентили p50/p95 — nearest-rank <b>только по успешным</b>, всегда вместе с числом наблюдений и долей отказов.</p>
+
+<h3>5.2 Prometheus</h3>
+<p>Classic histograms: <code>sim_ttfc_seconds</code>, <code>sim_request_duration_seconds{outcome}</code>, <code>sim_queue_wait_seconds</code>
+(границы <code>.01 .025 .05 .1 .2 .3 .5 .75 1 1.5 2 3 4 6 8 12 20 30 45 60</code> с, мельче там, где лежит основная масса TTFC);
+<code>sim_inter_chunk_seconds</code> (2 мс–2 с). Счётчики: <code>sim_requests_total{outcome}</code>, <code>sim_prefix_cache_lookups_total{result}</code>.
+Gauges: <code>sim_running</code>, <code>sim_waiting</code>, <code>sim_ready</code>. Метки ограничены: <code>model_version</code>, <code>outcome</code>, <code>result</code>,
+а <code>pod</code>/<code>version</code> добавляет relabel. Request ID и session ID — <b>только в журнале</b>, не в метках.
+Перцентиль считается из суммарных bucket-счётчиков всех Pod с сохранением <code>le</code>:</p>
+<pre>histogram_quantile(0.95, sum by (le) (rate(sim_ttfc_seconds_bucket[1m])))            # дашборд, алерт
+histogram_quantile(0.95, sum by (le, pod) (rate(sim_ttfc_seconds_bucket[1m])))       # по репликам
+histogram_quantile(0.95, sum by (le) (increase(sim_ttfc_seconds_bucket[&lt;окно&gt;s])))  # сверка за прогон</pre>
+<p><b>Сверка PromQL с журналами</b> (<code>analysis/promql_compare.py</code> → <code>results/tables/promql-vs-client.json</code>). Окно — весь прогон
+опыта B, от первой отправки −2 с до последнего завершения +6 с. Прогоны разделены паузой, поэтому набор ответов один и тот же.
+TTFC сервера — от приёма запроса до первой части, TTFC клиента дополнительно включает сеть и установку соединения.</p>
+<table>
+<tr><th>прогон</th><th>окно</th><th>ответов ok: клиент / журнал сервера / Prometheus</th><th>p50: PromQL / сервер / клиент</th><th>p95: PromQL / сервер / клиент</th><th>корзина p95</th></tr>
+<tr><td>B-router-uniform-r3</td><td class="n">157 с</td><td class="n">372 / 372 / 381,1</td><td class="n">0,943 / 0,950 / 0,971</td><td class="n">3,878 / 3,798 / 3,847</td><td class="n">(3, 4]</td></tr>
+<tr><td>B-default-skew80-r3</td><td class="n">160 с</td><td class="n">372 / 372 / 383,0</td><td class="n">3,717 / 3,673 / 3,702</td><td class="n">10,74 / 9,685 / 9,719</td><td class="n">(8, 12]</td></tr>
+<tr><td>B-clientip-skew80-r3</td><td class="n">167 с</td><td class="n">261 / 261 / 269,2</td><td class="n">10,08 / 10,38 / 10,40</td><td class="n">18,73 / 15,13 / 15,15</td><td class="n">(12, 20]</td></tr>
+</table>
+<p>Сервер и клиент расходятся на 3–35 мс: это сеть и accept. Prometheus показывает на 2–3% больше наблюдений:
+<code>increase()</code> экстраполирует счётчик на края окна по ближайшим отсчётам (scrape 5 с). Перцентиль PromQL точен до корзины
+и внутри неё интерполируется линейно. В узких корзинах (≤ 1 с) ошибка ≤ 0,08 с, в широкой корзине 12–20 с p95 завышен на 3,6 с
+(18,7 против 15,1). Для порога алерта 2 с это неважно: граница 2 с совпадает с границей корзины. Для отчёта о хвосте нужны
+более узкие корзины в диапазоне 8–20 с или native histograms.</p>
+
+<h3>5.3 Дашборд</h3>
+<p>Панели: TTFC p50/p95 по Pod; длительность полного ответа p50/p95; running/waiting по Pod; завершённые запр/с по Pod;
+ошибки и отказы по исходу; доля отказов; CPU по Pod (cAdvisor); RAM (working set); Ready-реплики, spec и HPA desired;
+доля попаданий имитации кеша; inter-chunk p95; ALERTS. Снимок после опытов: <code>results/grafana/dashboard.png</code>,
+экспорт JSON: <code>results/grafana/dashboard-export.json</code>.</p>
+<figure><img src="results/grafana/dashboard.png" alt="Grafana dashboard"><figcaption>Grafana: дашборд <code>hw11-llm-sim</code> за период опытов B и C
+(снимок headless Chrome; время на осях — MSK).</figcaption></figure>
+
+<h2 id="checks">6. Собственные проверки</h2>
+<p>Команды: <code>make test-k8s</code> (<code>tests/test_k8s.py</code>, обращается к сервису в Kubernetes из клиентского Pod через
+<code>kubectl exec</code>) и <code>make test-local</code> (<code>tests/test_local.py</code>). Журналы: <code>results/checks/</code>.</p>
+<table>
+<tr><th>#</th><th>проверка</th><th>что подтверждает</th><th>результат</th></tr>
+<tr><td>1</td><td><code>test_1_warming_pod_gets_no_traffic</code> (k8s)</td><td>Удаляет Pod. Пока <code>/startup</code> нового Pod ≠ 200 (запрос по IP Pod),
+он не Ready и отсутствует в Ready-адресах EndpointSlice. После прогрева появляется. В журнале нет <code>warm_at_receive=false</code></td>
+<td><span class="bad">FAILED</span> на исходном дефекте: «<code>llm-sim-9d77b8689-kvs87 прогревается (/startup=503), но уже в Ready EndpointSlice</code>»
+(<code>test_k8s-naive-probes.log</code>); <span class="ok">PASSED</span> после исправления (<code>test_k8s-fixed-probes-repeat.log</code>)</td></tr>
+<tr><td>2</td><td><code>test_2_loaded_version_matches_release</code> (k8s)</td><td>12 фактических ответов через Service: <code>model_version</code> и <code>model_sha256</code>
+совпадают с текущим релизом Helm (ConfigMap), ответили обе реплики, <code>backend_mode=simulated</code>. Запуск после цепочки
+A (rev 24) → B (до отката <code>/version</code> отвечал <code>model_version B</code>, sha <code>30db7df5…</code>) → <code>helm rollback sim 24</code>
+(<code>test_k8s-version-after-rollback.log</code>)</td><td class="ok">PASSED</td></tr>
+<tr><td>3</td><td><code>test_3_dialog_survives_pod_replacement</code> (k8s)</td><td>Ход 1 через ClientIP-Service, удаление ответившего Pod,
+ход 2 с историей в запросе. Отвечает другой Pod, контрольная строка диалога сохранена, версия и sha256 те же.
+Pod-замена поднимает тот же sha256 (<code>/version</code>)</td><td class="ok">PASSED</td></tr>
+<tr><td>4</td><td><code>test_4_failure_accounting</code> (local)</td><td>Генератор против поддельного сервера: 200, 429, 500, обрыв потока посередине,
+обрыв первой попытки с успешным повтором, зависание дольше тайм-аута. Сводка: 11 попыток, 6 логических, ok 2,
+<code>rejected 2, http_5xx 2, aborted 3, timeout 2</code>; повтор учтён отдельной попыткой; перцентили только по 2 успешным</td><td class="ok">PASSED</td></tr>
+<tr><td>5</td><td><code>test_5_two_dialogs_are_isolated</code> (k8s, ×2: Service и router)</td><td>Диалоги с контрольными строками <code>CTL-ALPHA-7Q</code> и
+<code>CTL-BRAVO-3Z</code> чередуются 3 хода через одну точку входа. В каждом ответе только своя строка и свой <code>session_id</code></td><td class="ok">PASSED</td></tr>
+<tr><td>+</td><td>маршрутизатор, LRU-кеш, проверка хеша артефакта (local)</td><td>affinity/overflow при пороге; вытеснение при ограниченном размере; неверный sha256 → ошибка</td><td class="ok">PASSED</td></tr>
+</table>
+
+<h2 id="review">7. Ревью PR «Навсегда закрепить диалог за Pod»</h2>
+<p><b>Решение: Request changes.</b> Жёсткое закрепление отклоняю. Предлагаю мягкую привязку и допуск по ожидаемому
+времени до первой части.</p>
+<p><b>При заданных условиях запрос идёт на B.</b> На A есть префикс, но очередь 3 с, и ожидаемый TTFC ≈ 3 с плюс короткий prefill
+по кешу, то есть ≈ 3,1 с. На B очереди нет, пересчёт занимает 0,8 с, TTFC ≈ 0,8 с. Закрепление выгодно, только пока
+<code>ожидание(A) + prefill_hit &lt; ожидание(B) + prefill_miss</code>. Правило выбора:
+<code>argmin(оценка ожидания + стоимость непокрытого кешем префикса)</code>. Предпочтительная реплика определяется хешем
+<code>session_id</code>, а не IP клиента. Так работает маршрутизатор <code>cache_aware</code> из опыта B: он отказывается от
+предпочтительной реплики при разнице загрузки ≥ 2 запросов. ClientIP-привязка в том же опыте закрепила всех клиентов
+за одним Pod (раздел 3): очередь и 429 на одной реплике, вторая простаивала.</p>
+<p><b>Каких измерений не хватает в PR:</b> (1) распределение ожидания на A во времени, а не снимок «3 с»;
+(2) зависимость пересчёта на B от длины префикса и загрузки B (0,8 с получены на свободной реплике);
+(3) доля попаданий в кеш и TTFC p50/p95 по репликам до и после изменения, при одном расписании и ≥ 3 прогонах;
+(4) запас KV-памяти на B: не вытеснит ли перенос чужие префиксы; (5) как часто диалог возвращается: после переноса
+следующие ходы идут на B, и кеш на B окупается; (6) отказы и тайм-ауты: при жёсткой привязке отказ одной реплики видят все её диалоги.</p>
+<p><b>Допуск нового запроса.</b> Очередь на реплике ограничена (<code>maxWaiting=16</code>, сверх — 429). Маршрутизатор не
+отправляет запрос туда, где ожидание больше бюджета TTFC или больше пересчёта на наименее загруженной реплике плюс запас.
+Если бюджет не держит ни одна реплика, клиент сразу получает 429 с <code>Retry-After</code>. Это лучше, чем 30 с ожидания и тайм-аут.
+Повторы клиента ограничены, с backoff, и учитываются отдельными попытками. Опыт A (2.4) показал: немедленный повтор после
+429 снова получает 429.</p>
+<p><b>Восстановление диалога после потери A.</b> История хранится вне Pod: в запросе или во внешнем хранилище. Любой Pod
+восстанавливает диалог ценой одного пересчёта префикса (≈ 0,8 с); это проверяет <code>test_3</code>. После исчезновения A из
+EndpointSlice rendezvous-хеш переносит на соседа только диалоги A, остальные сохраняют привязку и кеш.</p>
+<p><b>Уже начатый потоковый ответ</b> не переносится и дописывается на своей реплике. При плановом выводе это обеспечивают
+preStop/drain и grace period: в опыте A потоки 50–67 с пережили rollout. Если процесс упал (опыт A, kill -9), поток считается
+оборванным. Повтор допустим только как новая попытка с новым request ID. Клиент не склеивает молча два ответа: он
+показывает обрыв или явно запрашивает продолжение с уже полученным текстом в истории.</p>
+<p><b>Кейс из лекции.</b> Слайд 079 лекции: Anthropic, <i>«A postmortem of three recent issues»</i>, 17.09.2025,
+первичный источник: <a href="https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues">anthropic.com/engineering/a-postmortem-of-three-recent-issues</a>.
+Часть запросов Sonnet 4 по ошибке маршрутизировалась на серверы с конфигурацией контекста 1M. Маршрутизация была
+<b>sticky</b>, поэтому пользователь, однажды попавший на такой сервер, продолжал на него попадать. После изменения балансировки
+29 августа доля затронутых запросов выросла с 0,8% до 16%. Для нашего PR это значит: закрепление усиливает дефект одной
+реплики для всех привязанных к ней диалогов. Привязка должна быть мягкой и пересматриваться на каждом запросе — по
+здоровью, очереди и версии реплики. Это же подтверждает Google Inference Gateway (слайд 070): маршрутизация с учётом
+и префикса, и загрузки подняла долю попаданий в кеш с 35% до 70% и снизила p95 TTFT на 52%.</p>
+
+<h2 id="limits">8. Оставшиеся ограничения</h2>
+<ul>
+<li>Все числа относятся к <b>имитатору</b>. Кеш — LRU по ключам на границах сообщений, а не KV-блоки в памяти GPU. Стоимость
+промаха линейна по символам. Нет батчинга: два слота делят одно ядро (GIL + CPU limit 1). На настоящем inference engine
+(vLLM/SGLang) нужно отдельно проверить: долю попаданий префиксного кеша по метрикам engine, TTFT/TPOT по фактическим
+токенам, влияние continuous batching на ожидание, вытеснение KV при переносе диалогов, время загрузки весов на прогреве.</li>
+<li>Один узел kind: нет межузловой сети, привязки Pod к узлу, проблем с томом для весов (RWO/RWX). kube-proxy в режиме
+iptables; в IPVS/nftables и с внешним L7-балансировщиком поведение ClientIP и keep-alive другое.</li>
+<li>Маршрутизатор — одна реплика без HA и единая точка отказа. Его оценка загрузки — счётчик собственных запросов в работе,
+а при нескольких маршрутизаторах понадобится общий сигнал (метрики очереди от Pod).</li>
+<li>Prometheus хранит данные в emptyDir: при перезапуске Pod история теряется. Сырые клиентские журналы и экспорт
+query_range сохранены в репозитории.</li>
+</ul>
+</main>
+</body>
+</html>

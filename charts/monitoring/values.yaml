@@ -1,0 +1,22 @@
+targetNamespace: llm          # где живут Pod сервиса
+prometheus:
+  image: prom/prometheus:v3.5.0
+  scrapeInterval: 5s
+  retentionTime: 12h          # ограниченный срок хранения
+  retentionSize: 400MB
+  volumeSizeLimit: 1Gi        # emptyDir с лимитом
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: "1", memory: 768Mi}
+grafana:
+  image: grafana/grafana:12.1.1
+  resources:
+    requests: {cpu: 50m, memory: 128Mi}
+    limits: {cpu: 500m, memory: 384Mi}
+kubeStateMetrics:
+  image: registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.16.0
+alerts:
+  ttfcP95Seconds: 2.0         # порог p95 TTFC
+  errorRatio: 0.05            # доля отказов/ошибок
+  minRequests: 20             # минимальный объём наблюдений в окне 1m
+  for: 30s                    # период удержания условия (pending -> firing)

@@ -1,0 +1,3 @@
+# Исходный дефект опыта A: startup/readiness считают запуск HTTP-процесса готовностью.
+probes:
+  mode: naive

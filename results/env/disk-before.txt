@@ -1,0 +1,6 @@
+/dev/disk3s1s1   460Gi    10Gi    45Gi    19%    412k  471M    0%   /
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          11        4         3.484GB   2.268GB (65%)
+Containers      4         1         5.032MB   1.57MB (31%)
+Local Volumes   3         3         1.33GB    0B (0%)
+Build Cache     24        0         64.03kB   64.03kB

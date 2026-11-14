@@ -1,0 +1,5 @@
+apiVersion: v2
+name: monitoring
+description: ДЗ 11 — Prometheus (pod discovery + cAdvisor + kube-state-metrics), правила алертов, Grafana с дашбордом
+type: application
+version: 0.1.0

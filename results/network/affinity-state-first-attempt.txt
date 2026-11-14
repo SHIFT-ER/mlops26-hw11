@@ -1,0 +1,40 @@
+# kube-proxy mode
+clusterCIDR: 10.244.0.0/16
+conntrack:
+mode: iptables
+
+# pods
+NAME                       READY   STATUS    RESTARTS   AGE     IP            NODE                 NOMINATED NODE   READINESS GATES
+llm-router-c96d8cc-7gqgr   1/1     Running   0          6m49s   10.244.0.9    hw11-control-plane   <none>           <none>
+llm-sim-7656457bb9-486vp   1/1     Running   0          6m49s   10.244.0.10   hw11-control-plane   <none>           <none>
+llm-sim-7656457bb9-qshlh   1/1     Running   0          6m49s   10.244.0.11   hw11-control-plane   <none>           <none>
+loadclient-0               1/1     Running   0          6m49s   10.244.0.12   hw11-control-plane   <none>           <none>
+loadclient-1               1/1     Running   0          6m49s   10.244.0.14   hw11-control-plane   <none>           <none>
+loadclient-2               1/1     Running   0          6m49s   10.244.0.13   hw11-control-plane   <none>           <none>
+loadclient-3               1/1     Running   0          6m49s   10.244.0.15   hw11-control-plane   <none>           <none>
+
+# services
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE     SELECTOR
+llm-router         ClusterIP   10.96.199.171   <none>        8000/TCP   6m50s   app.kubernetes.io/name=llm-router
+llm-sim            ClusterIP   10.96.204.247   <none>        8000/TCP   6m50s   app.kubernetes.io/component=backend,app.kubernetes.io/instance=sim,app.kubernetes.io/name=llm-sim
+llm-sim-clientip   ClusterIP   10.96.59.186    <none>        8000/TCP   6m50s   app.kubernetes.io/component=backend,app.kubernetes.io/instance=sim,app.kubernetes.io/name=llm-sim
+
+# iptables affinity rules (llm-sim-clientip)
+-A KUBE-SEP-6S2VQLH2JJFHNRMB -s 10.244.0.10/32 -m comment --comment "llm/llm-sim-clientip:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-6S2VQLH2JJFHNRMB -p tcp -m comment --comment "llm/llm-sim-clientip:http" -m recent --set --name KUBE-SEP-6S2VQLH2JJFHNRMB --mask 255.255.255.255 --rsource -m tcp -j DNAT --to-destination 10.244.0.10:8000
+-A KUBE-SEP-KC5TEEBTIUC3Z2FR -s 10.244.0.11/32 -m comment --comment "llm/llm-sim-clientip:http" -j KUBE-MARK-MASQ
+-A KUBE-SEP-KC5TEEBTIUC3Z2FR -p tcp -m comment --comment "llm/llm-sim-clientip:http" -m recent --set --name KUBE-SEP-KC5TEEBTIUC3Z2FR --mask 255.255.255.255 --rsource -m tcp -j DNAT --to-destination 10.244.0.11:8000
+-A KUBE-SERVICES -d 10.96.59.186/32 -p tcp -m comment --comment "llm/llm-sim-clientip:http cluster IP" -m tcp --dport 8000 -j KUBE-SVC-7LMRJ5PM3UPAAXUY
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY ! -s 10.244.0.0/16 -d 10.96.59.186/32 -p tcp -m comment --comment "llm/llm-sim-clientip:http cluster IP" -m tcp --dport 8000 -j KUBE-MARK-MASQ
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.10:8000" -m recent --rcheck --seconds 10800 --reap --name KUBE-SEP-6S2VQLH2JJFHNRMB --mask 255.255.255.255 --rsource -j KUBE-SEP-6S2VQLH2JJFHNRMB
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.11:8000" -m recent --rcheck --seconds 10800 --reap --name KUBE-SEP-KC5TEEBTIUC3Z2FR --mask 255.255.255.255 --rsource -j KUBE-SEP-KC5TEEBTIUC3Z2FR
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.10:8000" -m statistic --mode random --probability 0.50000000000 -j KUBE-SEP-6S2VQLH2JJFHNRMB
+-A KUBE-SVC-7LMRJ5PM3UPAAXUY -m comment --comment "llm/llm-sim-clientip:http -> 10.244.0.11:8000" -j KUBE-SEP-KC5TEEBTIUC3Z2FR
+
+# xt_recent tables (IP источника, который видит механизм привязки)
+== /proc/net/xt_recent/KUBE-SEP-6S2VQLH2JJFHNRMB
+src=10.244.0.15 ttl: 64 last_seen: 4296001401 oldest_pkt: 29 4295712455, 4295726489, 4295737154, 4295746199, 4295761458, 4295887681, 4295888553, 4295889601, 4295910840, 4295914725, 4295917236, 4295920249, 4295928521, 4295945497, 4295948484, 4295949059, 4295960248, 4295961782, 4295965426, 4295971134, 4295971431, 4295977506, 4295993919, 4295994196, 4295994328, 4295995476, 4295996630, 4295997634, 4296001401
+src=10.244.0.13 ttl: 64 last_seen: 4296017263 oldest_pkt: 29 4295712324, 4295728330, 4295734266, 4295738993, 4295741483, 4295743320, 4295747914, 4295884508, 4295885573, 4295887070, 4295894840, 4295896955, 4295900824, 4295901278, 4295901954, 4295906029, 4295922397, 4295950871, 4295951041, 4295951066, 4295954411, 4295962498, 4295963171, 4295980136, 4295982875, 4295990827, 4296010612, 4296016376, 4296017263
+src=10.244.0.14 ttl: 64 last_seen: 4296014213 oldest_pkt: 3 4296011327, 4296012707, 4296014213, 4295726945, 4295732597, 4295746670, 4295751265, 4295751406, 4295885128, 4295888411, 4295894039, 4295901672, 4295901993, 4295902982, 4295903515, 4295905417, 4295910732, 4295910942, 4295923627, 4295933428, 4295934276, 4295935980, 4295962107, 4295962134, 4295964862, 4295966803, 4295966804, 4295967239, 4295968840, 4295979899, 4296004513, 4296009274
+src=10.244.0.12 ttl: 64 last_seen: 4296000451 oldest_pkt: 15 4295913802, 4295913961, 4295916761, 4295927831, 4295928337, 4295939961, 4295952529, 4295953379, 4295953853, 4295954632, 4295957704, 4295978994, 4295982978, 4296000145, 4296000451, 4295715798, 4295715816, 4295719125, 4295721083, 4295724595, 4295724630, 4295757991, 4295758066, 4295884750, 4295889000, 4295890631, 4295891123, 4295891456, 4295891680, 4295892255, 4295893235, 4295895919
+== /proc/net/xt_recent/KUBE-SEP-KC5TEEBTIUC3Z2FR

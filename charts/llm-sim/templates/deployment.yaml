@@ -1,0 +1,61 @@
+{{- $p := .Values.probes -}}
+{{- $fixed := eq $p.mode "fixed" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-sim
+  labels: {{- include "sim.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.hpa.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.maxSurge }}
+      maxUnavailable: {{ .Values.strategy.maxUnavailable }}
+  selector:
+    matchLabels: {{- include "sim.selector" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sim.selector" . | nindent 8 }}
+        model-version: {{ .Values.model.version | quote }}
+        probes-mode: {{ $p.mode | quote }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: /metrics
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.lifecycle.terminationGracePeriodSeconds }}
+      containers:
+        - name: sim
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["python", "-m", "app.server"]   # args, не command: PID 1 остаётся tini из ENTRYPOINT
+          ports: [{name: http, containerPort: 8000}]
+          envFrom: [{configMapRef: {name: llm-sim-config}}]
+          env:
+            - {name: POD_NAME, valueFrom: {fieldRef: {fieldPath: metadata.name}}}
+            - {name: POD_IP, valueFrom: {fieldRef: {fieldPath: status.podIP}}}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          startupProbe:
+            httpGet: {path: {{ ternary "/startup" "/health" $fixed }}, port: http}
+            periodSeconds: {{ $p.startup.periodSeconds }}
+            failureThreshold: {{ $p.startup.failureThreshold }}
+            timeoutSeconds: {{ $p.startup.timeoutSeconds }}
+          readinessProbe:
+            httpGet: {path: {{ ternary "/ready" "/health" $fixed }}, port: http}
+            periodSeconds: {{ $p.readiness.periodSeconds }}
+            failureThreshold: {{ $p.readiness.failureThreshold }}
+            timeoutSeconds: {{ $p.readiness.timeoutSeconds }}
+          livenessProbe:
+            httpGet: {path: /health, port: http}
+            periodSeconds: {{ $p.liveness.periodSeconds }}
+            failureThreshold: {{ $p.liveness.failureThreshold }}
+            timeoutSeconds: {{ $p.liveness.timeoutSeconds }}
+          lifecycle:
+            preStop:
+              httpGet: {path: /drain, port: http}

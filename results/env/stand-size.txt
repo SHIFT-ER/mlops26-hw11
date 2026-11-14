@@ -1,0 +1,60 @@
+суббота, 14 ноября 2026 г. 22:59:25 (MSK)
+## docker system df
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          13        4         3.484GB   2.269GB (65%)
+Containers      4         1         5.032MB   1.57MB (31%)
+Local Volumes   3         3         3.979GB   0B (0%)
+Build Cache     32        0         64.03kB   64.03kB
+
+## диск узла kind
+Filesystem      Size  Used Avail Use% Mounted on
+overlay         146G  7.2G  139G   5% /
+/dev/vdb1       146G  7.2G  139G   5% /var
+
+## образы в узле
+IMAGE                                                   TAG                  IMAGE ID            SIZE
+docker.io/grafana/grafana                               12.1.1               084f3a553cf17       694MB
+docker.io/kindest/kindnetd                              v20260820-69b56db7   8e13ccc0aaa68       35.7MB
+docker.io/kindest/local-path-helper                     v20260131-7181c60a   8f375e9f93513       2.74MB
+docker.io/kindest/local-path-provisioner                v20260820-69b56db7   0771a8a05619f       14.2MB
+docker.io/library/hw11-sim                              0.1.0                347a241240a69       192MB
+docker.io/library/hw11-sim                              0.1.1                7dab9bed2a4c8       192MB
+docker.io/prom/prometheus                               v3.5.0               5a1d4a6d0adfd       304MB
+registry.k8s.io/coredns/coredns                         v1.14.6              fbccbf70a429f       21.2MB
+registry.k8s.io/etcd                                    3.7.0-0              c2e426bbd1cd6       20.5MB
+registry.k8s.io/kube-apiserver-arm64                    v1.37.0              6003d52023b9d       97.1MB
+registry.k8s.io/kube-apiserver                          v1.37.0              6003d52023b9d       97.1MB
+registry.k8s.io/kube-controller-manager-arm64           v1.37.0              b1ad0e33c9012       85.1MB
+registry.k8s.io/kube-controller-manager                 v1.37.0              b1ad0e33c9012       85.1MB
+registry.k8s.io/kube-proxy-arm64                        v1.37.0              550b682d81d41       84.5MB
+registry.k8s.io/kube-proxy                              v1.37.0              550b682d81d41       84.5MB
+registry.k8s.io/kube-scheduler-arm64                    v1.37.0              384eabc4fe526       59.1MB
+registry.k8s.io/kube-scheduler                          v1.37.0              384eabc4fe526       59.1MB
+registry.k8s.io/kube-state-metrics/kube-state-metrics   v2.16.0              cf28a2c3ace4c       59.3MB
+registry.k8s.io/metrics-server/metrics-server           v0.8.0               bc6c1e09a843d       80.8MB
+registry.k8s.io/pause                                   3.10                 afb61768ce381       268kB
+
+## размер контейнера узла
+hw11-control-plane 3.46MB (virtual 931MB)
+
+## том Prometheus (emptyDir)
+4.6M	/prometheus
+
+## kubectl top
+NAME                 CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+hw11-control-plane   1633m        16%      1589Mi          29%         
+NAMESPACE            NAME                                         CPU(cores)   MEMORY(bytes)   
+llm                  llm-router-699d9d6bbb-m6g2h                  11m          35Mi            
+llm                  llm-sim-6674959984-2t2t5                     512m         35Mi            
+llm                  llm-sim-6674959984-4nvcw                     934m         36Mi            
+llm                  loadclient-0                                 14m          22Mi            
+llm                  loadclient-1                                 20m          24Mi            
+llm                  loadclient-2                                 15m          23Mi            
+llm                  loadclient-3                                 16m          41Mi            
+local-path-storage   local-path-provisioner-75f7fc7dc5-m8qjs      9m           38Mi            
+monitoring           grafana-67f9d664b5-gcmps                     6m           187Mi           
+monitoring           kube-state-metrics-86b8b78fb7-d74sc          1m           16Mi            
+monitoring           prometheus-55bb855499-gbcnq                  8m           59Mi            
+
+## свободное место хоста
+/dev/disk3s1s1   460Gi    10Gi   145Gi     7%    412k  1,5G    0%   /

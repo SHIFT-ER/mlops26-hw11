@@ -1,0 +1,1 @@
+{"run": "C-scale", "target": "http://llm-sim:8000", "start_at": 1794689546.3736498, "schedule": "/Users/pavel_sab/Documents/MLOps 7 \u0441\u0435\u043c/\u0414\u0417/\u0414\u041711/hw11/results/expC/schedule.json", "retries": 0, "timeout": 30, "keepalive": true}

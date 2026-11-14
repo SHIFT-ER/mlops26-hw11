@@ -1,0 +1,14 @@
+# resource metrics API (суббота, 14 ноября 2026 г. 23:51:51 (MSK))
+NAME                     SERVICE                      AVAILABLE   AGE
+v1beta1.metrics.k8s.io   kube-system/metrics-server   True        95m
+
+llm-router-699d9d6bbb-m6g2h [('router', {'cpu': '6551579n', 'memory': '38588Ki'})]
+llm-sim-6674959984-h6wn2 [('sim', {'cpu': '5642024n', 'memory': '35Mi'})]
+llm-sim-6674959984-nl97q [('sim', {'cpu': '3622879n', 'memory': '35732Ki'})]
+loadclient-0 [('client', {'cpu': '36371n', 'memory': '288Ki'})]
+loadclient-1 [('client', {'cpu': '29024n', 'memory': '1440Ki'})]
+loadclient-2 [('client', {'cpu': '36721n', 'memory': '248Ki'})]
+loadclient-3 [('client', {'cpu': '2956495n', 'memory': '13408Ki'})]
+
+# CPU requests контейнеров, участвующих в HPA
+sim: {"limits":{"cpu":"1","memory":"256Mi"},"requests":{"cpu":"500m","memory":"128Mi"}}

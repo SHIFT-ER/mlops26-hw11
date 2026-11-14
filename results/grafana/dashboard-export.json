@@ -1,0 +1,641 @@
+{
+    "meta": {
+        "type": "db",
+        "canSave": true,
+        "canEdit": true,
+        "canAdmin": true,
+        "canStar": false,
+        "canDelete": true,
+        "slug": "dz-11-c2b7-llm-sim-backend-mode3d-simulated",
+        "url": "/d/hw11-llm-sim/dz-11-c2b7-llm-sim-backend-mode3d-simulated",
+        "expires": "0001-01-01T00:00:00Z",
+        "created": "2026-11-14T19:16:56Z",
+        "updated": "2026-11-14T19:16:56Z",
+        "updatedBy": "Anonymous",
+        "createdBy": "Anonymous",
+        "version": 1,
+        "hasAcl": false,
+        "isFolder": false,
+        "apiVersion": "v0alpha1",
+        "folderId": 0,
+        "folderUid": "",
+        "folderTitle": "General",
+        "folderUrl": "",
+        "provisioned": true,
+        "provisionedExternalId": "llm-sim.json",
+        "annotationsPermissions": {
+            "dashboard": {
+                "canAdd": true,
+                "canEdit": true,
+                "canDelete": true
+            },
+            "organization": {
+                "canAdd": true,
+                "canEdit": true,
+                "canDelete": true
+            }
+        }
+    },
+    "dashboard": {
+        "id": 1,
+        "panels": [
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "s"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "id": 1,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "histogram_quantile(0.95, sum by (le, pod) (rate(sim_ttfc_seconds_bucket[1m])))",
+                        "legendFormat": "p95 {{pod}}",
+                        "refId": "A"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "histogram_quantile(0.5, sum by (le, pod) (rate(sim_ttfc_seconds_bucket[1m])))",
+                        "legendFormat": "p50 {{pod}}",
+                        "refId": "B"
+                    }
+                ],
+                "title": "TTFC p50/p95 \u043f\u043e Pod (classic histogram, \u043e\u043a\u043d\u043e 1m)",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "s"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 0
+                },
+                "id": 2,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "histogram_quantile(0.95, sum by (le) (rate(sim_request_duration_seconds_bucket{outcome=\"ok\"}[1m])))",
+                        "legendFormat": "p95",
+                        "refId": "A"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "histogram_quantile(0.5, sum by (le) (rate(sim_request_duration_seconds_bucket{outcome=\"ok\"}[1m])))",
+                        "legendFormat": "p50",
+                        "refId": "B"
+                    }
+                ],
+                "title": "\u0414\u043b\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0441\u0442\u044c \u043f\u043e\u043b\u043d\u043e\u0433\u043e \u043e\u0442\u0432\u0435\u0442\u0430 p50/p95 (outcome=ok)",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 8
+                },
+                "id": 3,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum by (pod) (sim_running{app=\"llm-sim\"})",
+                        "legendFormat": "running {{pod}}",
+                        "refId": "A"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum by (pod) (sim_waiting{app=\"llm-sim\"})",
+                        "legendFormat": "waiting {{pod}}",
+                        "refId": "B"
+                    }
+                ],
+                "title": "Running / waiting \u043f\u043e Pod",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "reqps"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 8
+                },
+                "id": 4,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum by (pod) (rate(sim_requests_total{outcome=\"ok\"}[1m]))",
+                        "legendFormat": "{{pod}}",
+                        "refId": "A"
+                    }
+                ],
+                "title": "\u0417\u0430\u0432\u0435\u0440\u0448\u0451\u043d\u043d\u044b\u0435 \u0437\u0430\u043f\u0440\u043e\u0441\u044b, 1/\u0441",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "reqps"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 16
+                },
+                "id": 5,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum by (outcome) (rate(sim_requests_total{outcome!=\"ok\"}[1m]))",
+                        "legendFormat": "{{outcome}}",
+                        "refId": "A"
+                    }
+                ],
+                "title": "\u041e\u0448\u0438\u0431\u043a\u0438 \u0438 \u043e\u0442\u043a\u0430\u0437\u044b, 1/\u0441",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "percentunit"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 16
+                },
+                "id": 6,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum(rate(sim_requests_total{outcome!=\"ok\"}[1m])) / sum(rate(sim_requests_total[1m]))",
+                        "legendFormat": "error ratio",
+                        "refId": "A"
+                    }
+                ],
+                "title": "\u0414\u043e\u043b\u044f \u043e\u0442\u043a\u0430\u0437\u043e\u0432",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 24
+                },
+                "id": 7,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{container=\"sim\"}[1m]))",
+                        "legendFormat": "{{pod}}",
+                        "refId": "A"
+                    }
+                ],
+                "title": "CPU \u043f\u043e Pod, \u044f\u0434\u0440\u0430 (cAdvisor)",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "bytes"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 24
+                },
+                "id": 8,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum by (pod) (container_memory_working_set_bytes{container=\"sim\"})",
+                        "legendFormat": "{{pod}}",
+                        "refId": "A"
+                    }
+                ],
+                "title": "RAM \u043f\u043e Pod (working set)",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 32
+                },
+                "id": 9,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "kube_deployment_status_replicas_ready{deployment=\"llm-sim\"}",
+                        "legendFormat": "ready",
+                        "refId": "A"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "kube_deployment_spec_replicas{deployment=\"llm-sim\"}",
+                        "legendFormat": "spec",
+                        "refId": "B"
+                    },
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "kube_horizontalpodautoscaler_status_desired_replicas",
+                        "legendFormat": "hpa desired",
+                        "refId": "C"
+                    }
+                ],
+                "title": "Ready-\u0440\u0435\u043f\u043b\u0438\u043a\u0438 \u0438 HPA",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "percentunit"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 32
+                },
+                "id": 10,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "sum(rate(sim_prefix_cache_lookups_total{result=\"hit\"}[1m])) / sum(rate(sim_prefix_cache_lookups_total[1m]))",
+                        "legendFormat": "hit ratio",
+                        "refId": "A"
+                    }
+                ],
+                "title": "\u041f\u0440\u0435\u0444\u0438\u043a\u0441\u043d\u044b\u0439 \u043a\u0435\u0448 (\u0438\u043c\u0438\u0442\u0430\u0446\u0438\u044f): \u0434\u043e\u043b\u044f hit",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "s"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 40
+                },
+                "id": 11,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "histogram_quantile(0.95, sum by (le) (rate(sim_inter_chunk_seconds_bucket[1m])))",
+                        "legendFormat": "p95",
+                        "refId": "A"
+                    }
+                ],
+                "title": "Inter-chunk latency p95",
+                "type": "timeseries"
+            },
+            {
+                "datasource": {
+                    "type": "prometheus",
+                    "uid": "prom"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "custom": {
+                            "lineWidth": 1,
+                            "showPoints": "never"
+                        },
+                        "unit": "short"
+                    },
+                    "overrides": []
+                },
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 40
+                },
+                "id": 12,
+                "options": {
+                    "legend": {
+                        "displayMode": "list",
+                        "placement": "bottom"
+                    },
+                    "tooltip": {
+                        "mode": "multi"
+                    }
+                },
+                "targets": [
+                    {
+                        "datasource": {
+                            "type": "prometheus",
+                            "uid": "prom"
+                        },
+                        "expr": "ALERTS",
+                        "legendFormat": "{{alertname}} {{alertstate}}",
+                        "refId": "A"
+                    }
+                ],
+                "title": "\u0410\u043b\u0435\u0440\u0442\u044b (ALERTS)",
+                "type": "timeseries"
+            }
+        ],
+        "refresh": "5s",
+        "schemaVersion": 41,
+        "tags": [
+            "hw11"
+        ],
+        "time": {
+            "from": "now-30m",
+            "to": "now"
+        },
+        "title": "\u0414\u0417 11 \u00b7 llm-sim (backend_mode=simulated)",
+        "uid": "hw11-llm-sim",
+        "version": 1
+    }
+}

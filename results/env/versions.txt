@@ -1,0 +1,52 @@
+## дата
+суббота, 14 ноября 2026 г. 19:31:00 (UTC)
+
+## хост
+ProductName:		macOS
+ProductVersion:		15.3.2
+BuildVersion:		24D81
+Apple M2 Pro
+RAM bytes: 17179869184
+
+## версии
+Version: 1.8.0 (1080000)
+docker client 27.3.1 / server 27.3.1
+kind v0.33.0 go1.27.0 darwin/arm64
+Client Version: v1.37.2
+Kustomize Version: v5.8.1
+Server Version: v1.37.0
+v4.3.2+g8346aaa
+uv 0.12.10 (3c979abda 2026-09-04 aarch64-apple-darwin)
+
+## лимиты контейнерного окружения (OrbStack VM)
+CPUs=10 MemTotal=5571682304 Driver=overlay2 Kernel=6.11.5-orbstack-00280-g96d99c92a42b
+
+## узел kind
+image=kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
+{"cpu":"10","ephemeral-storage":"50578255872","memory":"5441096Ki","pods":"110"}
+{"cpu":"10","ephemeral-storage":"50578255872","memory":"5441096Ki","pods":"110"}
+{"architecture":"arm64","bootID":"8dc3440b-1d27-4e01-8861-e83281fa705e","containerRuntimeVersion":"containerd://2.3.4","kernelVersion":"6.11.5-orbstack-00280-g96d99c92a42b","kubeProxyVersion":"","kubeletVersion":"v1.37.0","machineID":"4ddc133022ea4500966638b9556aff11","operatingSystem":"linux","osImage":"Debian GNU/Linux 13 (trixie)","runningInUserNamespace":false,"swap":{"capacity":6645415936},"systemUUID":"4ddc133022ea4500966638b9556aff11"}
+
+## образы в узле (digest)
+IMAGE                                                   TAG                  DIGEST              IMAGE ID            SIZE
+docker.io/grafana/grafana                               12.1.1               <none>              084f3a553cf17       694MB
+docker.io/library/hw11-sim                              0.1.0                4aa4962cdbfd7       347a241240a69       192MB
+docker.io/prom/prometheus                               v3.5.0               <none>              5a1d4a6d0adfd       304MB
+registry.k8s.io/kube-state-metrics/kube-state-metrics   v2.16.0              <none>              cf28a2c3ace4c       59.3MB
+registry.k8s.io/metrics-server/metrics-server           v0.8.0               <none>              bc6c1e09a843d       80.8MB
+
+## kube-proxy
+  maxPerCore: 0
+  min: null
+  minSyncPeriod: 1s
+  minSyncPeriod: 0s
+mode: iptables
+  minSyncPeriod: 0s
+
+## RepoDigests на хосте
+python:3.12-slim -> python@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+prom/prometheus:v3.5.0 -> prom/prometheus@sha256:63805ebb8d2b3920190daf1cb14a60871b16fd38bed42b857a3182bc621f4996
+grafana/grafana:12.1.1 -> grafana/grafana@sha256:a1701c2180249361737a99a01bc770db39381640e4d631825d38ff4535efa47d
+registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.16.0 -> registry.k8s.io/kube-state-metrics/kube-state-metrics@sha256:e750cd4b43f782e3106537026c2995cac85d921aedea334e1d16caad7877c360
+registry.k8s.io/metrics-server/metrics-server:v0.8.0 -> registry.k8s.io/metrics-server/metrics-server@sha256:89258156d0e9af60403eafd44da9676fd66f600c7934d468ccc17e42b199aee2
+hw11-sim:0.1.0 image id -> sha256:347a241240a6913273c40654dc01976fda6ca5f54949a24eb7dbe1fb10409459

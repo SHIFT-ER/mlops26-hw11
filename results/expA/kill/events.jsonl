@@ -1,0 +1,2 @@
+{"event": "kill9", "pod": "llm-sim-6674959984-2t2t5", "ts": 1794686176.406396}
+{"event": "summary", "attempts": 161, "logical": 139, "outcomes": {"ok": 122, "conn_error": 3, "rejected": 34, "aborted": 2}, "ok": 122, "logical_ok": 122, "error_share": 0.2422, "timeout_share": 0.0, "ttfc_p50": 1.6634, "ttfc_p95": 17.9959, "dur_p50": 2.1596, "dur_p95": 18.5801, "n_ttfc": 122, "send_lag_p95": 0.0585, "send_lag_max": 7.5738, "mean_ttfc": 4.682, "ts": 1794686252.873321}

@@ -1,0 +1,607 @@
+{
+ "warm-naive": {
+  "part": "warm-naive",
+  "summary": {
+   "attempts": 133,
+   "logical": 133,
+   "outcomes": {
+    "ok": 133
+   },
+   "ok": 133,
+   "logical_ok": 133,
+   "error_share": 0.0,
+   "timeout_share": 0.0,
+   "ttfc_p50": 0.8986,
+   "ttfc_p95": 14.5354,
+   "dur_p50": 1.0562,
+   "dur_p95": 14.7527,
+   "n_ttfc": 133,
+   "send_lag_p95": 0.0115,
+   "send_lag_max": 0.0167,
+   "mean_ttfc": 2.7379
+  },
+  "deleted": "llm-sim-9d77b8689-jdxkm",
+  "new_pod": {
+   "name": "llm-sim-9d77b8689-wxkgz",
+   "created_s": -0.2,
+   "warmup_start_s": 3.0,
+   "ready_s": 4.3,
+   "in_endpoints_s": 4.3,
+   "warmup_done_s": 23.1,
+   "first_request_s": 5.8,
+   "requests_total": 55,
+   "requests_received_cold": 16,
+   "cold_ttfc_max": 19.2721,
+   "cold_ttfc_min": 11.3619
+  },
+  "client_cold": {
+   "n": 16,
+   "ttfc_max": 19.2852,
+   "outcomes": {
+    "ok": 16
+   }
+  },
+  "ttfc_p95_all": 14.5354,
+  "ttfc_max_all": 19.2852
+ },
+ "warm-fixed": {
+  "part": "warm-fixed",
+  "summary": {
+   "attempts": 133,
+   "logical": 133,
+   "outcomes": {
+    "ok": 133
+   },
+   "ok": 133,
+   "logical_ok": 133,
+   "error_share": 0.0,
+   "timeout_share": 0.0,
+   "ttfc_p50": 1.1195,
+   "ttfc_p95": 2.7296,
+   "dur_p50": 1.3234,
+   "dur_p95": 2.9807,
+   "n_ttfc": 133,
+   "send_lag_p95": 0.0118,
+   "send_lag_max": 0.0177,
+   "mean_ttfc": 1.1988
+  },
+  "deleted": "llm-sim-6674959984-7sxkj",
+  "new_pod": {
+   "name": "llm-sim-6674959984-zrvhd",
+   "created_s": 0.0,
+   "warmup_start_s": 2.2,
+   "ready_s": 23.2,
+   "in_endpoints_s": 23.2,
+   "warmup_done_s": 22.2,
+   "first_request_s": 23.2,
+   "requests_total": 37,
+   "requests_received_cold": 0,
+   "cold_ttfc_max": null,
+   "cold_ttfc_min": null
+  },
+  "client_cold": {
+   "n": 0,
+   "ttfc_max": null,
+   "outcomes": {}
+  },
+  "ttfc_p95_all": 2.7296,
+  "ttfc_max_all": 4.8498
+ },
+ "rollout": {
+  "part": "rollout",
+  "summary": {
+   "attempts": 198,
+   "logical": 198,
+   "outcomes": {
+    "ok": 198
+   },
+   "ok": 198,
+   "logical_ok": 198,
+   "error_share": 0.0,
+   "timeout_share": 0.0,
+   "ttfc_p50": 1.1669,
+   "ttfc_p95": 6.5721,
+   "dur_p50": 1.3394,
+   "dur_p95": 7.8241,
+   "n_ttfc": 198,
+   "send_lag_p95": 0.0118,
+   "send_lag_max": 0.0172,
+   "mean_ttfc": 1.7887
+  },
+  "pods": [
+   {
+    "pod": "llm-sim-6674959984-mlssj",
+    "version": "A",
+    "created": -153.9,
+    "ready": -19.5,
+    "in_endpoints": -19.5,
+    "deleting": 52.5,
+    "drain_start": 52.2,
+    "running_at_drain": 2,
+    "out_of_endpoints": 52.5,
+    "process_stop": 60.4,
+    "gone": 62.6,
+    "requests": 126
+   },
+   {
+    "pod": "llm-sim-6674959984-zrvhd",
+    "version": "A",
+    "created": -103.9,
+    "ready": -19.5,
+    "in_endpoints": -19.5,
+    "deleting": 27.5,
+    "drain_start": 26.7,
+    "running_at_drain": 2,
+    "out_of_endpoints": 27.5,
+    "process_stop": 41.0,
+    "gone": 42.7,
+    "requests": 76
+   },
+   {
+    "pod": "llm-sim-6bf6fd66bc-c4xnm",
+    "version": "B",
+    "created": 1.1,
+    "ready": 27.5,
+    "in_endpoints": 26.6,
+    "deleting": null,
+    "drain_start": null,
+    "running_at_drain": null,
+    "out_of_endpoints": null,
+    "process_stop": null,
+    "gone": null,
+    "requests": 68
+   },
+   {
+    "pod": "llm-sim-6bf6fd66bc-rsjtg",
+    "version": "B",
+    "created": 26.1,
+    "ready": 52.5,
+    "in_endpoints": 52.5,
+    "deleting": null,
+    "drain_start": null,
+    "running_at_drain": null,
+    "out_of_endpoints": null,
+    "process_stop": null,
+    "gone": null,
+    "requests": 50
+   }
+  ],
+  "long_streams": [
+   {
+    "id": 196,
+    "pod": "llm-sim-6674959984-zrvhd",
+    "version": "A",
+    "start": -10.1,
+    "end": 40.9,
+    "chunks": 2800,
+    "outcome": "ok"
+   },
+   {
+    "id": 197,
+    "pod": "llm-sim-6674959984-mlssj",
+    "version": "A",
+    "start": -7.1,
+    "end": 60.3,
+    "chunks": 4200,
+    "outcome": "ok"
+   }
+  ],
+  "by_version_outcome": {
+   "A:ok": 80,
+   "B:ok": 118
+  },
+  "http_5xx": 0,
+  "aborted": 0,
+  "events": [
+   {
+    "event": "helm_upgrade_start",
+    "t": 0.0
+   },
+   {
+    "event": "helm_upgrade_applied",
+    "t": 1.9
+   },
+   {
+    "event": "rollout_status_done",
+    "t": 52.4
+   }
+  ]
+ },
+ "broken": {
+  "part": "broken",
+  "summary": {
+   "attempts": 196,
+   "logical": 196,
+   "outcomes": {
+    "ok": 196
+   },
+   "ok": 196,
+   "logical_ok": 196,
+   "error_share": 0.0,
+   "timeout_share": 0.0,
+   "ttfc_p50": 0.8169,
+   "ttfc_p95": 2.1091,
+   "dur_p50": 0.9279,
+   "dur_p95": 2.2814,
+   "n_ttfc": 196,
+   "send_lag_p95": 0.0095,
+   "send_lag_max": 0.0194,
+   "mean_ttfc": 0.8224
+  },
+  "rollback_at": 70.0,
+  "b_pods": [
+   {
+    "pod": "llm-sim-5b9b76b5b7-mhkfx",
+    "ready": false,
+    "in_endpoints": false,
+    "restarts": 1,
+    "gone": 78.9,
+    "error": [
+     "ValueError: sha256 артефакта model-B.json = 30db7df5ad0e…, ожидался 0…"
+    ]
+   }
+  ],
+  "versions_between": {
+   "A": 98
+  },
+  "versions_after_rollback": {
+   "A": 72
+  },
+  "sha_after_rollback": [
+   "f5518680fa9a5e25637d47dedacab62f4d3dcf066bce34b7313efd705735b5b1"
+  ],
+  "helm_history": [
+   {
+    "revision": 15,
+    "status": "superseded",
+    "description": "Upgrade complete"
+   },
+   {
+    "revision": 16,
+    "status": "superseded",
+    "description": "Upgrade complete"
+   },
+   {
+    "revision": 17,
+    "status": "superseded",
+    "description": "Upgrade complete"
+   },
+   {
+    "revision": 18,
+    "status": "deployed",
+    "description": "Rollback to 16"
+   }
+  ]
+ },
+ "kill": {
+  "part": "kill",
+  "pod": "llm-sim-6674959984-2t2t5",
+  "summary": {
+   "attempts": 161,
+   "logical": 139,
+   "outcomes": {
+    "ok": 122,
+    "conn_error": 3,
+    "rejected": 34,
+    "aborted": 2
+   },
+   "ok": 122,
+   "logical_ok": 122,
+   "error_share": 0.2422,
+   "timeout_share": 0.0,
+   "ttfc_p50": 1.6634,
+   "ttfc_p95": 17.9959,
+   "dur_p50": 2.1596,
+   "dur_p95": 18.5801,
+   "n_ttfc": 122,
+   "send_lag_p95": 0.0585,
+   "send_lag_max": 7.5738,
+   "mean_ttfc": 4.682
+  },
+  "restarts": 1,
+  "detected_not_ready_s": 1.4,
+  "ready_again_s": 24.8,
+  "failed_first_attempts": {
+   "conn_error": 2,
+   "rejected": 18,
+   "aborted": 2
+  },
+  "failed_first_on_victim": 2,
+  "failed_errors": {
+   "RemoteProtocolError: Server disconnected without sending a r": 2,
+   "queue is full": 18,
+   "RemoteProtocolError: peer closed connection without sending ": 2
+  },
+  "retries": 22,
+  "retries_ok": 5,
+  "logical": 139,
+  "logical_ok": 122,
+  "long_streams": [
+   {
+    "id": 136,
+    "attempt": 0,
+    "pod": "llm-sim-6674959984-2t2t5",
+    "outcome": "aborted",
+    "chunks": 306,
+    "of": 600
+   },
+   {
+    "id": 136,
+    "attempt": 1,
+    "pod": "llm-sim-6674959984-4nvcw",
+    "outcome": "ok",
+    "chunks": 600,
+    "of": 600
+   },
+   {
+    "id": 137,
+    "attempt": 0,
+    "pod": "llm-sim-6674959984-4nvcw",
+    "outcome": "ok",
+    "chunks": 600,
+    "of": 600
+   },
+   {
+    "id": 138,
+    "attempt": 0,
+    "pod": null,
+    "outcome": "conn_error",
+    "chunks": 0,
+    "of": 600
+   },
+   {
+    "id": 138,
+    "attempt": 1,
+    "pod": "llm-sim-6674959984-4nvcw",
+    "outcome": "ok",
+    "chunks": 600,
+    "of": 600
+   }
+  ],
+  "window_failures": [
+   {
+    "t": -0.1,
+    "outcome": "conn_error",
+    "pod": null,
+    "attempt": 0
+   },
+   {
+    "t": 11.5,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 11.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 13.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 13.7,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 16.0,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 16.0,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": -7.1,
+    "outcome": "aborted",
+    "pod": "llm-sim-6674959984-2t2t5",
+    "attempt": 0
+   },
+   {
+    "t": 13.0,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 13.0,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 13.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 13.7,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 13.8,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 13.8,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 15.0,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 15.0,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 16.3,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 17.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 17.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 13.1,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 13.1,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": -3.2,
+    "outcome": "conn_error",
+    "pod": null,
+    "attempt": 0
+   },
+   {
+    "t": -3.5,
+    "outcome": "aborted",
+    "pod": "llm-sim-6674959984-2t2t5",
+    "attempt": 0
+   },
+   {
+    "t": 0.4,
+    "outcome": "conn_error",
+    "pod": null,
+    "attempt": 1
+   },
+   {
+    "t": 12.3,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 12.3,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 12.4,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 12.4,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 17.9,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 17.9,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 19.4,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 21.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 21.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 21.6,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 21.7,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 22.7,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 22.7,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   },
+   {
+    "t": 23.3,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 0
+   },
+   {
+    "t": 23.3,
+    "outcome": "rejected",
+    "pod": "llm-sim-6674959984-4nvcw",
+    "attempt": 1
+   }
+  ]
+ },
+ "keepalive": [
+  {
+   "pod": "llm-sim-fdb4dc5f8-bv5h7",
+   "ready_s": 7.1,
+   "in_endpoints_s": 7.1,
+   "requests": 23,
+   "observed_until_s": 46.4
+  }
+ ]
+}

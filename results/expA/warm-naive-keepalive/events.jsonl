@@ -1,0 +1,2 @@
+{"event": "baseline_warm", "pods": ["llm-sim-fdb4dc5f8-6qkfl", "llm-sim-fdb4dc5f8-kq6p7"], "probes": "naive", "ts": 1794684787.271947}
+{"event": "delete_pod", "pod": "llm-sim-fdb4dc5f8-6qkfl", "ts": 1794684813.250954}

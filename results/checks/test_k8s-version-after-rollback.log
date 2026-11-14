@@ -1,0 +1,7 @@
+# воскресенье, 15 ноября 2026 г. 00:10:27 (MSK): A(rev 24) -> B -> helm rollback sim 24
+до отката /version: {"status":"ready","warm":true,"cache_entries":0,"pod":"llm-sim-6bf6fd66bc-jtm5t","model_version":"B","model_sha256":"30db7df5ad0ecc7b53ac5c588a94031424e3d526254035323276347c045735cc","backend_mode":"simulated"}
+24      	Sun Nov 15 00:08:02 2026	superseded	llm-sim-0.1.0	0.1.1      	Upgrade complete
+25      	Sun Nov 15 00:08:03 2026	superseded	llm-sim-0.1.0	0.1.1      	Upgrade complete
+26      	Sun Nov 15 00:09:14 2026	deployed  	llm-sim-0.1.0	0.1.1      	Rollback to 24  
+tests/test_k8s.py::test_2_loaded_version_matches_release PASSED          [100%]
+======================= 1 passed, 4 deselected in 6.15s ========================

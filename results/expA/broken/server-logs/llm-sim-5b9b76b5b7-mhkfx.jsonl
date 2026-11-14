@@ -1,0 +1,5 @@
+{"event": "load_failed", "pod": "llm-sim-5b9b76b5b7-mhkfx", "error": "ValueError: sha256 артефакта model-B.json = 30db7df5ad0e…, ожидался 0…", "ts": 1794686008.4928215}
+{"event": "process_start", "pod": "llm-sim-5b9b76b5b7-mhkfx", "pid": 11, "ts": 1794686008.494124}
+{"event": "drain_start", "pod": "llm-sim-5b9b76b5b7-mhkfx", "running": 0, "waiting": 0, "ts": 1794686066.4495332}
+{"event": "drain_done", "pod": "llm-sim-5b9b76b5b7-mhkfx", "running": 0, "ts": 1794686072.4501019}
+{"event": "process_stop", "pod": "llm-sim-5b9b76b5b7-mhkfx", "running": 0, "ts": 1794686072.617366}

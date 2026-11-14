@@ -1,0 +1,6 @@
+apiVersion: v2
+name: llm-sim
+description: ДЗ 11 — имитатор LLM-сервиса (backend_mode=simulated), Service x2, маршрутизатор, клиенты, HPA
+type: application
+version: 0.1.0
+appVersion: "0.1.1"

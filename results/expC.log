@@ -1,0 +1,23 @@
+23:52:21 {"event": "hpa_config", "hpa": {"behavior": {"scaleDown": {"policies": [{"periodSeconds": 15, "type": "Pods", "value": 1}], "selectPolicy": "Max", "stabilizationWindowSeconds": 60}, "scaleUp": {"polic
+23:53:08 {"event": "alert_state", "alert": "SimHighTTFC", "state": "pending", "prev": "inactive", "ts": 1794689588.314585}
+23:53:33 {"event": "alert_state", "alert": "SimHighErrorRatio", "state": "pending", "prev": "inactive", "ts": 1794689613.045548}
+23:53:37 {"event": "alert_state", "alert": "SimHighTTFC", "state": "firing", "prev": "pending", "ts": 1794689617.112486}
+23:54:01 {"event": "alert_state", "alert": "SimHighErrorRatio", "state": "firing", "prev": "pending", "ts": 1794689641.8322911}
+23:57:57 {"event": "alert_state", "alert": "SimHighErrorRatio", "state": "inactive", "prev": "firing", "ts": 1794689877.93054}
+23:58:18 {"event": "alert_state", "alert": "SimHighTTFC", "state": "inactive", "prev": "firing", "ts": 1794689898.109644}
+23:59:16 {"event": "alert_state", "alert": "SimHighTTFC", "state": "pending", "prev": "inactive", "ts": 1794689956.433405}
+23:59:26 {"event": "alert_state", "alert": "SimHighTTFC", "state": "inactive", "prev": "pending", "ts": 1794689966.5872781}
+00:01:57 {"event": "load_finished", "ts": 1794690117.394628}
+00:01:57 {"event": "back_to_min", "after_load_s": 0.2, "ts": 1794690117.547678}
+00:02:20 {"event": "summary", "attempts": 1248, "logical": 1248, "outcomes": {"ok": 893, "rejected": 355}, "ok": 893, "logical_ok": 893, "error_share": 0.2845, "timeout_share": 0.0, "ttfc_p50": 10.8858, "ttfc_
+00:02:24 {"event": "hpa_config", "hpa": {"behavior": {"scaleDown": {"policies": [{"periodSeconds": 15, "type": "Pods", "value": 1}], "selectPolicy": "Max", "stabilizationWindowSeconds": 60}, "scaleUp": {"polic
+00:02:46 {"event": "alert_state", "alert": "SimHighTTFC", "state": "pending", "prev": "inactive", "ts": 1794690166.618156}
+00:03:17 {"event": "alert_state", "alert": "SimHighTTFC", "state": "firing", "prev": "pending", "ts": 1794690197.289978}
+00:03:21 {"event": "alert_state", "alert": "SimHighErrorRatio", "state": "pending", "prev": "inactive", "ts": 1794690201.346852}
+00:03:51 {"event": "alert_state", "alert": "SimHighErrorRatio", "state": "firing", "prev": "pending", "ts": 1794690231.82737}
+00:06:02 {"event": "load_finished", "ts": 1794690362.426861}
+00:06:46 {"event": "alert_state", "alert": "SimHighErrorRatio", "state": "inactive", "prev": "firing", "ts": 1794690406.3493109}
+00:06:52 {"event": "alert_state", "alert": "SimHighTTFC", "state": "inactive", "prev": "firing", "ts": 1794690412.4082172}
+00:07:19 {"event": "back_to_min", "after_load_s": 77.1, "ts": 1794690439.512747}
+00:07:42 {"event": "summary", "attempts": 504, "logical": 504, "outcomes": {"ok": 354, "rejected": 150}, "ok": 354, "logical_ok": 354, "error_share": 0.2976, "timeout_share": 0.0, "ttfc_p50": 10.1656, "ttfc_p9
+C-DONE

@@ -1,0 +1,4 @@
+{"event": "helm_upgrade_start", "to": "B", "ts": 1794685796.895999}
+{"event": "helm_upgrade_applied", "to": "B", "ts": 1794685798.789851}
+{"event": "rollout_status_done", "out": " rollout to finish: 1 old replicas are pending termination...\nWaiting for deployment \"llm-sim\" rollout to finish: 1 old replicas are pending termination...\ndeployment \"llm-sim\" successfully rolled out", "ts": 1794685849.28536}
+{"event": "summary", "attempts": 198, "logical": 198, "outcomes": {"ok": 198}, "ok": 198, "logical_ok": 198, "error_share": 0.0, "timeout_share": 0.0, "ttfc_p50": 1.1669, "ttfc_p95": 6.5721, "dur_p50": 1.3394, "dur_p95": 7.8241, "n_ttfc": 198, "send_lag_p95": 0.0118, "send_lag_max": 0.0172, "mean_ttfc": 1.7887, "ts": 1794685936.5374122}

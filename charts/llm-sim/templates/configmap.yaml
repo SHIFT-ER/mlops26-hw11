@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-sim-config
+  labels: {{- include "sim.labels" . | nindent 4 }}
+data:
+  MODEL_VERSION: {{ .Values.model.version | quote }}
+  MODEL_FILE: {{ .Values.model.file | quote }}
+  MODEL_SHA256: {{ .Values.model.sha256 | quote }}
+  WARMUP_SECONDS: {{ .Values.warmupSeconds | quote }}
+  MAX_CONCURRENCY: {{ .Values.sim.maxConcurrency | quote }}
+  MAX_WAITING: {{ .Values.sim.maxWaiting | quote }}
+  CACHE_ENABLED: {{ .Values.sim.cacheEnabled | quote }}
+  CACHE_ENTRIES: {{ .Values.sim.cacheEntries | quote }}
+  PREFILL_BASE_MS: {{ .Values.sim.prefillBaseMs | quote }}
+  PREFILL_MS_PER_KCHAR: {{ .Values.sim.prefillMsPerKchar | quote }}
+  CHUNK_CPU_MS: {{ .Values.sim.chunkCpuMs | quote }}
+  MAX_CHUNKS: {{ .Values.sim.maxChunks | quote }}
+  WARM_WAIT_TIMEOUT: {{ .Values.sim.warmWaitTimeout | quote }}
+  DRAIN_SECONDS: {{ .Values.lifecycle.drainSeconds | quote }}
+  GRACEFUL_SECONDS: {{ .Values.lifecycle.gracefulSeconds | quote }}

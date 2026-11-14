@@ -1,0 +1,8 @@
+# Один узел kind: control-plane и рабочие Pod на нём же (ограниченный стенд на ноутбуке).
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: hw11
+networking:
+  kubeProxyMode: iptables   # sessionAffinity: ClientIP реализуется модулем recent в iptables
+nodes:
+  - role: control-plane

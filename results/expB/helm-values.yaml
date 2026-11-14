@@ -1,0 +1,85 @@
+COMPUTED VALUES:
+clients:
+  enabled: true
+  replicas: 4
+  resources:
+    limits:
+      cpu: 500m
+      memory: 192Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+hpa:
+  cpuAverageUtilization: 60
+  enabled: false
+  maxReplicas: 3
+  minReplicas: 2
+  scaleDownStabilizationSeconds: 60
+  scaleUpStabilizationSeconds: 0
+image:
+  pullPolicy: Never
+  repository: hw11-sim
+  tag: 0.1.1
+lifecycle:
+  drainSeconds: 6
+  gracefulSeconds: 50
+  terminationGracePeriodSeconds: 70
+model:
+  file: models/model-A.json
+  sha256: f5518680fa9a5e25637d47dedacab62f4d3dcf066bce34b7313efd705735b5b1
+  version: A
+probes:
+  liveness:
+    failureThreshold: 3
+    periodSeconds: 10
+    timeoutSeconds: 3
+  mode: fixed
+  readiness:
+    failureThreshold: 2
+    periodSeconds: 2
+    timeoutSeconds: 2
+  startup:
+    failureThreshold: 30
+    periodSeconds: 2
+    timeoutSeconds: 2
+replicaCount: 2
+resources:
+  limits:
+    cpu: "1"
+    memory: 256Mi
+  requests:
+    cpu: 500m
+    memory: 128Mi
+router:
+  balanceThreshold: 2
+  enabled: true
+  policy: cache_aware
+  resources:
+    limits:
+      cpu: "1"
+      memory: 192Mi
+    requests:
+      cpu: 200m
+      memory: 96Mi
+services:
+  clientIP:
+    name: llm-sim-clientip
+    port: 8000
+    timeoutSeconds: 10800
+  default:
+    name: llm-sim
+    port: 8000
+sim:
+  cacheEnabled: true
+  cacheEntries: 128
+  chunkCpuMs: 10
+  maxChunks: 5000
+  maxConcurrency: 2
+  maxWaiting: 16
+  prefillBaseMs: 10
+  prefillMsPerKchar: 300
+  warmWaitTimeout: 60
+strategy:
+  maxSurge: 1
+  maxUnavailable: 0
+warmupSeconds: 20

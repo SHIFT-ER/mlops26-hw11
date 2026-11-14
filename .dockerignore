@@ -1,0 +1,10 @@
+.git
+.venv
+results
+report*
+charts
+tests
+analysis
+scripts
+__pycache__
+*.pyc

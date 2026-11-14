@@ -1,0 +1,12 @@
+rootdir: /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collecting ... collected 5 items
+
+tests/test_k8s.py::test_1_warming_pod_gets_no_traffic PASSED             [ 20%]
+tests/test_k8s.py::test_2_loaded_version_matches_release PASSED          [ 40%]
+tests/test_k8s.py::test_3_dialog_survives_pod_replacement PASSED         [ 60%]
+tests/test_k8s.py::test_5_two_dialogs_are_isolated[http://llm-sim:8000] PASSED [ 80%]
+tests/test_k8s.py::test_5_two_dialogs_are_isolated[http://llm-router:8000] PASSED [100%]
+
+========================= 5 passed in 61.65s (0:01:01) =========================

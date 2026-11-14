@@ -1,0 +1,4 @@
+model:
+  version: B
+  file: models/model-B.json
+  sha256: 30db7df5ad0ecc7b53ac5c588a94031424e3d526254035323276347c045735cc

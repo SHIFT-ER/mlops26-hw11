@@ -1,0 +1,1292 @@
+[
+ {
+  "run": "B-clientip-uniform-r1",
+  "policy": "clientip",
+  "traffic": "uniform",
+  "rep": 1,
+  "attempts": 291,
+  "logical": 291,
+  "outcomes": {
+   "ok": 275,
+   "rejected": 16
+  },
+  "ok": 275,
+  "logical_ok": 275,
+  "error_share": 0.055,
+  "timeout_share": 0.0,
+  "ttfc_p50": 3.0142,
+  "ttfc_p95": 10.6108,
+  "dur_p50": 3.5071,
+  "dur_p95": 11.1411,
+  "n_ttfc": 275,
+  "send_lag_p95": 0.0102,
+  "send_lag_max": 0.015,
+  "mean_ttfc": 3.6541,
+  "cache_hit": 0.738,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 78,
+    "share": 0.268,
+    "ok": 78,
+    "rejected": 0,
+    "ttfc_p50": 0.1723,
+    "ttfc_p95": 1.7003,
+    "queue_p95": 0.3898,
+    "clients": {
+     "1": 78
+    }
+   },
+   "4nvcw": {
+    "requests": 213,
+    "share": 0.732,
+    "ok": 197,
+    "rejected": 16,
+    "ttfc_p50": 4.2828,
+    "ttfc_p95": 11.2835,
+    "queue_p95": 10.6035,
+    "clients": {
+     "0": 66,
+     "2": 79,
+     "3": 68
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 66
+   },
+   "1": {
+    "2t2t5": 78
+   },
+   "2": {
+    "4nvcw": 79
+   },
+   "3": {
+    "4nvcw": 68
+   }
+  }
+ },
+ {
+  "run": "B-router-uniform-r1",
+  "policy": "router",
+  "traffic": "uniform",
+  "rep": 1,
+  "attempts": 291,
+  "logical": 291,
+  "outcomes": {
+   "ok": 291
+  },
+  "ok": 291,
+  "logical_ok": 291,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 0.8473,
+  "ttfc_p95": 3.6836,
+  "dur_p50": 1.2223,
+  "dur_p95": 4.1975,
+  "n_ttfc": 291,
+  "send_lag_p95": 0.0107,
+  "send_lag_max": 0.0197,
+  "mean_ttfc": 1.261,
+  "cache_hit": 0.653,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 142,
+    "share": 0.488,
+    "ok": 142,
+    "rejected": 0,
+    "ttfc_p50": 0.9586,
+    "ttfc_p95": 3.87,
+    "queue_p95": 2.8526,
+    "clients": {
+     "0": 44,
+     "1": 28,
+     "2": 47,
+     "3": 23
+    }
+   },
+   "4nvcw": {
+    "requests": 149,
+    "share": 0.512,
+    "ok": 149,
+    "rejected": 0,
+    "ttfc_p50": 0.8073,
+    "ttfc_p95": 3.4347,
+    "queue_p95": 2.1523,
+    "clients": {
+     "0": 22,
+     "1": 50,
+     "2": 32,
+     "3": 45
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "2t2t5": 44,
+    "4nvcw": 22
+   },
+   "1": {
+    "4nvcw": 50,
+    "2t2t5": 28
+   },
+   "2": {
+    "2t2t5": 47,
+    "4nvcw": 32
+   },
+   "3": {
+    "4nvcw": 45,
+    "2t2t5": 23
+   }
+  }
+ },
+ {
+  "run": "B-default-uniform-r1",
+  "policy": "default",
+  "traffic": "uniform",
+  "rep": 1,
+  "attempts": 291,
+  "logical": 291,
+  "outcomes": {
+   "ok": 291
+  },
+  "ok": 291,
+  "logical_ok": 291,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 1.7114,
+  "ttfc_p95": 5.1594,
+  "dur_p50": 2.1573,
+  "dur_p95": 5.6718,
+  "n_ttfc": 291,
+  "send_lag_p95": 0.0093,
+  "send_lag_max": 0.0249,
+  "mean_ttfc": 1.9421,
+  "cache_hit": 0.595,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 133,
+    "share": 0.457,
+    "ok": 133,
+    "rejected": 0,
+    "ttfc_p50": 1.4605,
+    "ttfc_p95": 5.1594,
+    "queue_p95": 4.006,
+    "clients": {
+     "0": 28,
+     "1": 24,
+     "2": 59,
+     "3": 22
+    }
+   },
+   "4nvcw": {
+    "requests": 158,
+    "share": 0.543,
+    "ok": 158,
+    "rejected": 0,
+    "ttfc_p50": 1.9268,
+    "ttfc_p95": 5.2249,
+    "queue_p95": 3.473,
+    "clients": {
+     "0": 38,
+     "1": 54,
+     "2": 20,
+     "3": 46
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 38,
+    "2t2t5": 28
+   },
+   "1": {
+    "4nvcw": 54,
+    "2t2t5": 24
+   },
+   "2": {
+    "2t2t5": 59,
+    "4nvcw": 20
+   },
+   "3": {
+    "4nvcw": 46,
+    "2t2t5": 22
+   }
+  }
+ },
+ {
+  "run": "B-clientip-skew80-r1",
+  "policy": "clientip",
+  "traffic": "skew80",
+  "rep": 1,
+  "attempts": 291,
+  "logical": 291,
+  "outcomes": {
+   "ok": 215,
+   "rejected": 76
+  },
+  "ok": 215,
+  "logical_ok": 215,
+  "error_share": 0.2612,
+  "timeout_share": 0.0,
+  "ttfc_p50": 9.6096,
+  "ttfc_p95": 13.4302,
+  "dur_p50": 10.1192,
+  "dur_p95": 13.8391,
+  "n_ttfc": 215,
+  "send_lag_p95": 0.0086,
+  "send_lag_max": 0.0278,
+  "mean_ttfc": 8.4653,
+  "cache_hit": 0.67,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 29,
+    "share": 0.1,
+    "ok": 29,
+    "rejected": 0,
+    "ttfc_p50": 0.1214,
+    "ttfc_p95": 0.8417,
+    "queue_p95": 0.0001,
+    "clients": {
+     "1": 29
+    }
+   },
+   "4nvcw": {
+    "requests": 262,
+    "share": 0.9,
+    "ok": 186,
+    "rejected": 76,
+    "ttfc_p50": 10.1115,
+    "ttfc_p95": 13.4384,
+    "queue_p95": 11.87,
+    "clients": {
+     "0": 234,
+     "2": 17,
+     "3": 11
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 234
+   },
+   "1": {
+    "2t2t5": 29
+   },
+   "2": {
+    "4nvcw": 17
+   },
+   "3": {
+    "4nvcw": 11
+   }
+  }
+ },
+ {
+  "run": "B-router-skew80-r1",
+  "policy": "router",
+  "traffic": "skew80",
+  "rep": 1,
+  "attempts": 291,
+  "logical": 291,
+  "outcomes": {
+   "ok": 291
+  },
+  "ok": 291,
+  "logical_ok": 291,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 1.3086,
+  "ttfc_p95": 3.7376,
+  "dur_p50": 1.8079,
+  "dur_p95": 4.3858,
+  "n_ttfc": 291,
+  "send_lag_p95": 0.0115,
+  "send_lag_max": 0.0317,
+  "mean_ttfc": 1.4717,
+  "cache_hit": 0.622,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 144,
+    "share": 0.495,
+    "ok": 144,
+    "rejected": 0,
+    "ttfc_p50": 1.4227,
+    "ttfc_p95": 3.8797,
+    "queue_p95": 2.8532,
+    "clients": {
+     "0": 120,
+     "1": 13,
+     "2": 6,
+     "3": 5
+    }
+   },
+   "4nvcw": {
+    "requests": 147,
+    "share": 0.505,
+    "ok": 147,
+    "rejected": 0,
+    "ttfc_p50": 1.2918,
+    "ttfc_p95": 3.7361,
+    "queue_p95": 2.5266,
+    "clients": {
+     "0": 114,
+     "1": 16,
+     "2": 11,
+     "3": 6
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 114,
+    "2t2t5": 120
+   },
+   "1": {
+    "2t2t5": 13,
+    "4nvcw": 16
+   },
+   "2": {
+    "4nvcw": 11,
+    "2t2t5": 6
+   },
+   "3": {
+    "2t2t5": 5,
+    "4nvcw": 6
+   }
+  }
+ },
+ {
+  "run": "B-default-skew80-r1",
+  "policy": "default",
+  "traffic": "skew80",
+  "rep": 1,
+  "attempts": 291,
+  "logical": 291,
+  "outcomes": {
+   "ok": 288,
+   "rejected": 3
+  },
+  "ok": 288,
+  "logical_ok": 288,
+  "error_share": 0.0103,
+  "timeout_share": 0.0,
+  "ttfc_p50": 2.7608,
+  "ttfc_p95": 10.105,
+  "dur_p50": 3.2558,
+  "dur_p95": 10.6864,
+  "n_ttfc": 288,
+  "send_lag_p95": 0.009,
+  "send_lag_max": 0.0208,
+  "mean_ttfc": 3.3923,
+  "cache_hit": 0.542,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 171,
+    "share": 0.588,
+    "ok": 168,
+    "rejected": 3,
+    "ttfc_p50": 3.451,
+    "ttfc_p95": 10.8776,
+    "queue_p95": 9.8638,
+    "clients": {
+     "0": 145,
+     "1": 12,
+     "2": 6,
+     "3": 8
+    }
+   },
+   "4nvcw": {
+    "requests": 120,
+    "share": 0.412,
+    "ok": 120,
+    "rejected": 0,
+    "ttfc_p50": 1.258,
+    "ttfc_p95": 5.4665,
+    "queue_p95": 4.5494,
+    "clients": {
+     "0": 89,
+     "1": 17,
+     "2": 11,
+     "3": 3
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "2t2t5": 145,
+    "4nvcw": 89
+   },
+   "1": {
+    "2t2t5": 12,
+    "4nvcw": 17
+   },
+   "2": {
+    "4nvcw": 11,
+    "2t2t5": 6
+   },
+   "3": {
+    "4nvcw": 3,
+    "2t2t5": 8
+   }
+  }
+ },
+ {
+  "run": "B-router-uniform-r2",
+  "policy": "router",
+  "traffic": "uniform",
+  "rep": 2,
+  "attempts": 263,
+  "logical": 263,
+  "outcomes": {
+   "ok": 263
+  },
+  "ok": 263,
+  "logical_ok": 263,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 0.3194,
+  "ttfc_p95": 2.1611,
+  "dur_p50": 0.7422,
+  "dur_p95": 2.6791,
+  "n_ttfc": 263,
+  "send_lag_p95": 0.0078,
+  "send_lag_max": 0.0138,
+  "mean_ttfc": 0.7135,
+  "cache_hit": 0.665,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 129,
+    "share": 0.49,
+    "ok": 129,
+    "rejected": 0,
+    "ttfc_p50": 0.3229,
+    "ttfc_p95": 2.1275,
+    "queue_p95": 0.7282,
+    "clients": {
+     "0": 46,
+     "1": 18,
+     "2": 35,
+     "3": 30
+    }
+   },
+   "4nvcw": {
+    "requests": 134,
+    "share": 0.51,
+    "ok": 134,
+    "rejected": 0,
+    "ttfc_p50": 0.3194,
+    "ttfc_p95": 2.1955,
+    "queue_p95": 1.1254,
+    "clients": {
+     "0": 29,
+     "1": 45,
+     "2": 26,
+     "3": 34
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "2t2t5": 46,
+    "4nvcw": 29
+   },
+   "1": {
+    "4nvcw": 45,
+    "2t2t5": 18
+   },
+   "2": {
+    "4nvcw": 26,
+    "2t2t5": 35
+   },
+   "3": {
+    "2t2t5": 30,
+    "4nvcw": 34
+   }
+  }
+ },
+ {
+  "run": "B-default-uniform-r2",
+  "policy": "default",
+  "traffic": "uniform",
+  "rep": 2,
+  "attempts": 263,
+  "logical": 263,
+  "outcomes": {
+   "ok": 263
+  },
+  "ok": 263,
+  "logical_ok": 263,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 0.8072,
+  "ttfc_p95": 2.9804,
+  "dur_p50": 1.1492,
+  "dur_p95": 3.4742,
+  "n_ttfc": 263,
+  "send_lag_p95": 0.0093,
+  "send_lag_max": 0.0189,
+  "mean_ttfc": 1.04,
+  "cache_hit": 0.635,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 143,
+    "share": 0.544,
+    "ok": 143,
+    "rejected": 0,
+    "ttfc_p50": 1.1424,
+    "ttfc_p95": 3.1357,
+    "queue_p95": 2.1642,
+    "clients": {
+     "0": 25,
+     "1": 38,
+     "2": 21,
+     "3": 59
+    }
+   },
+   "4nvcw": {
+    "requests": 120,
+    "share": 0.456,
+    "ok": 120,
+    "rejected": 0,
+    "ttfc_p50": 0.2574,
+    "ttfc_p95": 2.2549,
+    "queue_p95": 1.0867,
+    "clients": {
+     "0": 50,
+     "1": 25,
+     "2": 40,
+     "3": 5
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 50,
+    "2t2t5": 25
+   },
+   "1": {
+    "4nvcw": 25,
+    "2t2t5": 38
+   },
+   "2": {
+    "4nvcw": 40,
+    "2t2t5": 21
+   },
+   "3": {
+    "2t2t5": 59,
+    "4nvcw": 5
+   }
+  }
+ },
+ {
+  "run": "B-clientip-uniform-r2",
+  "policy": "clientip",
+  "traffic": "uniform",
+  "rep": 2,
+  "attempts": 263,
+  "logical": 263,
+  "outcomes": {
+   "ok": 263
+  },
+  "ok": 263,
+  "logical_ok": 263,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 1.807,
+  "ttfc_p95": 4.9944,
+  "dur_p50": 2.2952,
+  "dur_p95": 5.4264,
+  "n_ttfc": 263,
+  "send_lag_p95": 0.0084,
+  "send_lag_max": 0.0129,
+  "mean_ttfc": 2.096,
+  "cache_hit": 0.726,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 63,
+    "share": 0.24,
+    "ok": 63,
+    "rejected": 0,
+    "ttfc_p50": 0.1116,
+    "ttfc_p95": 1.5321,
+    "queue_p95": 0.8081,
+    "clients": {
+     "1": 63
+    }
+   },
+   "4nvcw": {
+    "requests": 200,
+    "share": 0.76,
+    "ok": 200,
+    "rejected": 0,
+    "ttfc_p50": 2.7544,
+    "ttfc_p95": 5.3841,
+    "queue_p95": 4.1488,
+    "clients": {
+     "0": 75,
+     "2": 61,
+     "3": 64
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 75
+   },
+   "1": {
+    "2t2t5": 63
+   },
+   "2": {
+    "4nvcw": 61
+   },
+   "3": {
+    "4nvcw": 64
+   }
+  }
+ },
+ {
+  "run": "B-router-skew80-r2",
+  "policy": "router",
+  "traffic": "skew80",
+  "rep": 2,
+  "attempts": 263,
+  "logical": 263,
+  "outcomes": {
+   "ok": 263
+  },
+  "ok": 263,
+  "logical_ok": 263,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 0.3117,
+  "ttfc_p95": 2.1791,
+  "dur_p50": 0.721,
+  "dur_p95": 2.6889,
+  "n_ttfc": 263,
+  "send_lag_p95": 0.0093,
+  "send_lag_max": 0.0502,
+  "mean_ttfc": 0.7132,
+  "cache_hit": 0.681,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 129,
+    "share": 0.49,
+    "ok": 129,
+    "rejected": 0,
+    "ttfc_p50": 0.352,
+    "ttfc_p95": 2.0357,
+    "queue_p95": 0.7185,
+    "clients": {
+     "0": 96,
+     "1": 20,
+     "2": 7,
+     "3": 6
+    }
+   },
+   "4nvcw": {
+    "requests": 134,
+    "share": 0.51,
+    "ok": 134,
+    "rejected": 0,
+    "ttfc_p50": 0.3018,
+    "ttfc_p95": 2.313,
+    "queue_p95": 1.1693,
+    "clients": {
+     "0": 117,
+     "1": 7,
+     "2": 5,
+     "3": 5
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 117,
+    "2t2t5": 96
+   },
+   "1": {
+    "2t2t5": 20,
+    "4nvcw": 7
+   },
+   "2": {
+    "4nvcw": 5,
+    "2t2t5": 7
+   },
+   "3": {
+    "2t2t5": 6,
+    "4nvcw": 5
+   }
+  }
+ },
+ {
+  "run": "B-default-skew80-r2",
+  "policy": "default",
+  "traffic": "skew80",
+  "rep": 2,
+  "attempts": 263,
+  "logical": 263,
+  "outcomes": {
+   "ok": 263
+  },
+  "ok": 263,
+  "logical_ok": 263,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 1.3042,
+  "ttfc_p95": 3.9962,
+  "dur_p50": 1.6423,
+  "dur_p95": 4.544,
+  "n_ttfc": 263,
+  "send_lag_p95": 0.0082,
+  "send_lag_max": 0.0343,
+  "mean_ttfc": 1.5265,
+  "cache_hit": 0.582,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 153,
+    "share": 0.582,
+    "ok": 153,
+    "rejected": 0,
+    "ttfc_p50": 1.5649,
+    "ttfc_p95": 4.3888,
+    "queue_p95": 3.1997,
+    "clients": {
+     "0": 127,
+     "1": 15,
+     "2": 10,
+     "3": 1
+    }
+   },
+   "4nvcw": {
+    "requests": 110,
+    "share": 0.418,
+    "ok": 110,
+    "rejected": 0,
+    "ttfc_p50": 1.02,
+    "ttfc_p95": 3.2848,
+    "queue_p95": 1.9883,
+    "clients": {
+     "0": 86,
+     "1": 12,
+     "2": 2,
+     "3": 10
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "2t2t5": 127,
+    "4nvcw": 86
+   },
+   "1": {
+    "4nvcw": 12,
+    "2t2t5": 15
+   },
+   "2": {
+    "2t2t5": 10,
+    "4nvcw": 2
+   },
+   "3": {
+    "4nvcw": 10,
+    "2t2t5": 1
+   }
+  }
+ },
+ {
+  "run": "B-clientip-skew80-r2",
+  "policy": "clientip",
+  "traffic": "skew80",
+  "rep": 2,
+  "attempts": 263,
+  "logical": 263,
+  "outcomes": {
+   "ok": 203,
+   "rejected": 60
+  },
+  "ok": 203,
+  "logical_ok": 203,
+  "error_share": 0.2281,
+  "timeout_share": 0.0,
+  "ttfc_p50": 10.7741,
+  "ttfc_p95": 14.6238,
+  "dur_p50": 11.224,
+  "dur_p95": 15.1638,
+  "n_ttfc": 203,
+  "send_lag_p95": 0.0096,
+  "send_lag_max": 0.044,
+  "mean_ttfc": 9.6081,
+  "cache_hit": 0.621,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 27,
+    "share": 0.103,
+    "ok": 27,
+    "rejected": 0,
+    "ttfc_p50": 0.1283,
+    "ttfc_p95": 0.834,
+    "queue_p95": 0.0002,
+    "clients": {
+     "1": 27
+    }
+   },
+   "4nvcw": {
+    "requests": 236,
+    "share": 0.897,
+    "ok": 176,
+    "rejected": 60,
+    "ttfc_p50": 11.1442,
+    "ttfc_p95": 14.9155,
+    "queue_p95": 13.5284,
+    "clients": {
+     "0": 213,
+     "2": 12,
+     "3": 11
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 213
+   },
+   "1": {
+    "2t2t5": 27
+   },
+   "2": {
+    "4nvcw": 12
+   },
+   "3": {
+    "4nvcw": 11
+   }
+  }
+ },
+ {
+  "run": "B-default-uniform-r3",
+  "policy": "default",
+  "traffic": "uniform",
+  "rep": 3,
+  "attempts": 299,
+  "logical": 299,
+  "outcomes": {
+   "ok": 299
+  },
+  "ok": 299,
+  "logical_ok": 299,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 2.6836,
+  "ttfc_p95": 6.8361,
+  "dur_p50": 3.2533,
+  "dur_p95": 7.3823,
+  "n_ttfc": 299,
+  "send_lag_p95": 0.0119,
+  "send_lag_max": 0.0223,
+  "mean_ttfc": 3.1288,
+  "cache_hit": 0.592,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 170,
+    "share": 0.569,
+    "ok": 170,
+    "rejected": 0,
+    "ttfc_p50": 3.8641,
+    "ttfc_p95": 7.4753,
+    "queue_p95": 6.3938,
+    "clients": {
+     "0": 29,
+     "1": 32,
+     "2": 52,
+     "3": 57
+    }
+   },
+   "4nvcw": {
+    "requests": 129,
+    "share": 0.431,
+    "ok": 129,
+    "rejected": 0,
+    "ttfc_p50": 1.9149,
+    "ttfc_p95": 5.5024,
+    "queue_p95": 3.9901,
+    "clients": {
+     "0": 44,
+     "1": 40,
+     "2": 28,
+     "3": 17
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 44,
+    "2t2t5": 29
+   },
+   "1": {
+    "4nvcw": 40,
+    "2t2t5": 32
+   },
+   "2": {
+    "4nvcw": 28,
+    "2t2t5": 52
+   },
+   "3": {
+    "2t2t5": 57,
+    "4nvcw": 17
+   }
+  }
+ },
+ {
+  "run": "B-clientip-uniform-r3",
+  "policy": "clientip",
+  "traffic": "uniform",
+  "rep": 3,
+  "attempts": 299,
+  "logical": 299,
+  "outcomes": {
+   "ok": 282,
+   "rejected": 17
+  },
+  "ok": 282,
+  "logical_ok": 282,
+  "error_share": 0.0569,
+  "timeout_share": 0.0,
+  "ttfc_p50": 6.4325,
+  "ttfc_p95": 10.0994,
+  "dur_p50": 6.8996,
+  "dur_p95": 10.5534,
+  "n_ttfc": 282,
+  "send_lag_p95": 0.0088,
+  "send_lag_max": 0.0176,
+  "mean_ttfc": 5.4969,
+  "cache_hit": 0.752,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 72,
+    "share": 0.241,
+    "ok": 72,
+    "rejected": 0,
+    "ttfc_p50": 0.1395,
+    "ttfc_p95": 1.0945,
+    "queue_p95": 0.1529,
+    "clients": {
+     "1": 72
+    }
+   },
+   "4nvcw": {
+    "requests": 227,
+    "share": 0.759,
+    "ok": 210,
+    "rejected": 17,
+    "ttfc_p50": 7.2205,
+    "ttfc_p95": 10.3729,
+    "queue_p95": 9.4233,
+    "clients": {
+     "0": 73,
+     "2": 80,
+     "3": 74
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 73
+   },
+   "1": {
+    "2t2t5": 72
+   },
+   "2": {
+    "4nvcw": 80
+   },
+   "3": {
+    "4nvcw": 74
+   }
+  }
+ },
+ {
+  "run": "B-router-uniform-r3",
+  "policy": "router",
+  "traffic": "uniform",
+  "rep": 3,
+  "attempts": 299,
+  "logical": 299,
+  "outcomes": {
+   "ok": 299
+  },
+  "ok": 299,
+  "logical_ok": 299,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 0.7432,
+  "ttfc_p95": 3.1612,
+  "dur_p50": 1.1815,
+  "dur_p95": 3.6116,
+  "n_ttfc": 299,
+  "send_lag_p95": 0.0113,
+  "send_lag_max": 0.042,
+  "mean_ttfc": 1.0732,
+  "cache_hit": 0.692,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 145,
+    "share": 0.485,
+    "ok": 145,
+    "rejected": 0,
+    "ttfc_p50": 0.8749,
+    "ttfc_p95": 3.0789,
+    "queue_p95": 2.079,
+    "clients": {
+     "0": 47,
+     "1": 26,
+     "2": 45,
+     "3": 27
+    }
+   },
+   "4nvcw": {
+    "requests": 154,
+    "share": 0.515,
+    "ok": 154,
+    "rejected": 0,
+    "ttfc_p50": 0.5195,
+    "ttfc_p95": 3.4482,
+    "queue_p95": 1.8741,
+    "clients": {
+     "0": 26,
+     "1": 46,
+     "2": 35,
+     "3": 47
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 26,
+    "2t2t5": 47
+   },
+   "1": {
+    "4nvcw": 46,
+    "2t2t5": 26
+   },
+   "2": {
+    "4nvcw": 35,
+    "2t2t5": 45
+   },
+   "3": {
+    "2t2t5": 27,
+    "4nvcw": 47
+   }
+  }
+ },
+ {
+  "run": "B-default-skew80-r3",
+  "policy": "default",
+  "traffic": "skew80",
+  "rep": 3,
+  "attempts": 299,
+  "logical": 299,
+  "outcomes": {
+   "ok": 299
+  },
+  "ok": 299,
+  "logical_ok": 299,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 3.9018,
+  "ttfc_p95": 9.9824,
+  "dur_p50": 4.2862,
+  "dur_p95": 10.414,
+  "n_ttfc": 299,
+  "send_lag_p95": 0.0117,
+  "send_lag_max": 0.0282,
+  "mean_ttfc": 4.2901,
+  "cache_hit": 0.582,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 142,
+    "share": 0.475,
+    "ok": 142,
+    "rejected": 0,
+    "ttfc_p50": 4.0687,
+    "ttfc_p95": 10.7437,
+    "queue_p95": 9.5659,
+    "clients": {
+     "0": 113,
+     "1": 9,
+     "2": 7,
+     "3": 13
+    }
+   },
+   "4nvcw": {
+    "requests": 157,
+    "share": 0.525,
+    "ok": 157,
+    "rejected": 0,
+    "ttfc_p50": 3.5344,
+    "ttfc_p95": 9.7155,
+    "queue_p95": 8.2387,
+    "clients": {
+     "0": 125,
+     "1": 17,
+     "2": 9,
+     "3": 6
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "2t2t5": 113,
+    "4nvcw": 125
+   },
+   "1": {
+    "4nvcw": 17,
+    "2t2t5": 9
+   },
+   "2": {
+    "4nvcw": 9,
+    "2t2t5": 7
+   },
+   "3": {
+    "2t2t5": 13,
+    "4nvcw": 6
+   }
+  }
+ },
+ {
+  "run": "B-clientip-skew80-r3",
+  "policy": "clientip",
+  "traffic": "skew80",
+  "rep": 3,
+  "attempts": 299,
+  "logical": 299,
+  "outcomes": {
+   "ok": 197,
+   "rejected": 102
+  },
+  "ok": 197,
+  "logical_ok": 197,
+  "error_share": 0.3411,
+  "timeout_share": 0.0,
+  "ttfc_p50": 11.2357,
+  "ttfc_p95": 15.3288,
+  "dur_p50": 11.7409,
+  "dur_p95": 15.8793,
+  "n_ttfc": 197,
+  "send_lag_p95": 0.0105,
+  "send_lag_max": 0.0204,
+  "mean_ttfc": 10.2718,
+  "cache_hit": 0.619,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 26,
+    "share": 0.087,
+    "ok": 26,
+    "rejected": 0,
+    "ttfc_p50": 0.1369,
+    "ttfc_p95": 0.8394,
+    "queue_p95": 0.0002,
+    "clients": {
+     "1": 26
+    }
+   },
+   "4nvcw": {
+    "requests": 273,
+    "share": 0.913,
+    "ok": 171,
+    "rejected": 102,
+    "ttfc_p50": 11.7264,
+    "ttfc_p95": 15.3922,
+    "queue_p95": 14.1795,
+    "clients": {
+     "0": 238,
+     "2": 16,
+     "3": 19
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "4nvcw": 238
+   },
+   "1": {
+    "2t2t5": 26
+   },
+   "2": {
+    "4nvcw": 16
+   },
+   "3": {
+    "4nvcw": 19
+   }
+  }
+ },
+ {
+  "run": "B-router-skew80-r3",
+  "policy": "router",
+  "traffic": "skew80",
+  "rep": 3,
+  "attempts": 299,
+  "logical": 299,
+  "outcomes": {
+   "ok": 299
+  },
+  "ok": 299,
+  "logical_ok": 299,
+  "error_share": 0.0,
+  "timeout_share": 0.0,
+  "ttfc_p50": 0.8101,
+  "ttfc_p95": 3.0755,
+  "dur_p50": 1.1918,
+  "dur_p95": 3.5725,
+  "n_ttfc": 299,
+  "send_lag_p95": 0.0128,
+  "send_lag_max": 0.0331,
+  "mean_ttfc": 1.049,
+  "cache_hit": 0.689,
+  "per_pod": {
+   "2t2t5": {
+    "requests": 150,
+    "share": 0.502,
+    "ok": 150,
+    "rejected": 0,
+    "ttfc_p50": 0.7626,
+    "ttfc_p95": 2.9288,
+    "queue_p95": 1.8173,
+    "clients": {
+     "0": 120,
+     "1": 15,
+     "2": 5,
+     "3": 10
+    }
+   },
+   "4nvcw": {
+    "requests": 149,
+    "share": 0.498,
+    "ok": 149,
+    "rejected": 0,
+    "ttfc_p50": 0.8208,
+    "ttfc_p95": 3.0755,
+    "queue_p95": 1.7499,
+    "clients": {
+     "0": 118,
+     "1": 11,
+     "2": 11,
+     "3": 9
+    }
+   }
+  },
+  "client_to_pod": {
+   "0": {
+    "2t2t5": 120,
+    "4nvcw": 118
+   },
+   "1": {
+    "4nvcw": 11,
+    "2t2t5": 15
+   },
+   "2": {
+    "4nvcw": 11,
+    "2t2t5": 5
+   },
+   "3": {
+    "2t2t5": 10,
+    "4nvcw": 9
+   }
+  }
+ }
+]

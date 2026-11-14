@@ -1,0 +1,18 @@
+[project]
+name = "hw11"
+version = "0.1.0"
+description = "ДЗ 11: имитатор LLM-сервиса в Kubernetes под нагрузкой (backend_mode=simulated)"
+requires-python = ">=3.12,<3.13"
+# Зависимости образа закреплены с хешами в requirements.lock (uv pip compile requirements.in)
+dependencies = ["fastapi==0.163.0", "uvicorn==0.54.0", "httpx==0.28.1", "prometheus-client==0.26.0"]
+
+[dependency-groups]
+dev = ["pytest==8.4.2", "matplotlib==3.10.7", "numpy==2.3.4"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "tests"]
+markers = ["k8s: обращается к сервису в Kubernetes"]

@@ -1,0 +1,84 @@
+# ---- образ: собирается локально и загружается в kind (kind load docker-image) ----
+image:
+  repository: hw11-sim
+  tag: "0.1.1"
+  pullPolicy: Never
+
+replicaCount: 2
+
+# ---- версия модели-имитатора: файл в образе + закреплённый sha256 (проверяется при старте) ----
+model:
+  version: A
+  file: models/model-A.json
+  sha256: f5518680fa9a5e25637d47dedacab62f4d3dcf066bce34b7313efd705735b5b1
+
+warmupSeconds: 20
+
+# ---- probes: fixed — разные назначения; naive — исходный дефект (всё смотрит на /health) ----
+probes:
+  mode: fixed
+  startup:            # период * порог = 60 с > прогрева 20 с с запасом x3
+    periodSeconds: 2
+    failureThreshold: 30
+    timeoutSeconds: 2
+  readiness:
+    periodSeconds: 2
+    failureThreshold: 2
+    timeoutSeconds: 2
+  liveness:
+    periodSeconds: 10
+    failureThreshold: 3
+    timeoutSeconds: 3
+
+# ---- корректное завершение: preStop /drain -> SIGTERM -> uvicorn ждёт активные потоки ----
+lifecycle:
+  drainSeconds: 6               # снятие из EndpointSlice (readiness 2 с x 2) + запас
+  gracefulSeconds: 50           # uvicorn timeout_graceful_shutdown
+  terminationGracePeriodSeconds: 70   # > drain + graceful + запас
+
+strategy:
+  maxSurge: 1
+  maxUnavailable: 0
+
+# ---- модель нагрузки имитатора (сохраняется в отчёте) ----
+sim:
+  maxConcurrency: 2        # одновременно обрабатываемых запросов на Pod
+  maxWaiting: 16           # очередь; сверх неё — 429
+  cacheEnabled: true
+  cacheEntries: 128        # LRU-ключей префикса на Pod (~60% рабочего набора 20 диалогов, см. отчёт)
+  prefillBaseMs: 10
+  prefillMsPerKchar: 300   # CPU-мс на 1000 символов непокрытого кешем префикса (промах ~0.8 с)
+  chunkCpuMs: 10           # CPU-мс на часть ответа
+  maxChunks: 5000         # длительные потоки опыта A — до 4200 частей
+  warmWaitTimeout: 60
+
+resources:
+  requests: {cpu: 500m, memory: 128Mi}
+  limits: {cpu: "1", memory: 256Mi}
+
+services:
+  default: {name: llm-sim, port: 8000}
+  clientIP: {name: llm-sim-clientip, port: 8000, timeoutSeconds: 10800}
+
+router:
+  enabled: true
+  policy: cache_aware
+  balanceThreshold: 2
+  resources:
+    requests: {cpu: 200m, memory: 96Mi}
+    limits: {cpu: "1", memory: 192Mi}
+
+clients:
+  enabled: true
+  replicas: 4
+  resources:
+    requests: {cpu: 100m, memory: 64Mi}
+    limits: {cpu: 500m, memory: 192Mi}
+
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 3
+  cpuAverageUtilization: 60     # % от requests.cpu (500m) -> порог 300m в среднем
+  scaleUpStabilizationSeconds: 0
+  scaleDownStabilizationSeconds: 60

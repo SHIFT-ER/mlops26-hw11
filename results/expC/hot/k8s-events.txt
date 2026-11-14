@@ -1,0 +1,109 @@
+LAST SEEN   TYPE      REASON              OBJECT                            MESSAGE
+19m         Normal    Scheduled           pod/llm-sim-6674959984-6685c      Successfully assigned llm/llm-sim-6674959984-6685c to hw11-control-plane
+19m         Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-6685c
+19m         Normal    Killing             pod/llm-sim-6674959984-2t2t5      Stopping container sim
+19m         Normal    Pulled              pod/llm-sim-6674959984-6685c      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+19m         Normal    Created             pod/llm-sim-6674959984-6685c      Container created
+19m         Normal    Started             pod/llm-sim-6674959984-6685c      Container started
+19m         Warning   Unhealthy           pod/llm-sim-6674959984-2t2t5      Readiness probe failed: HTTP probe failed with statuscode: 503
+19m         Warning   Unhealthy           pod/llm-sim-6674959984-6685c      Startup probe failed: HTTP probe failed with statuscode: 503
+19m         Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-fjl6m
+19m         Normal    Scheduled           pod/llm-sim-6674959984-fjl6m      Successfully assigned llm/llm-sim-6674959984-fjl6m to hw11-control-plane
+19m         Normal    Killing             pod/llm-sim-6674959984-4nvcw      Stopping container sim
+18m         Normal    Pulled              pod/llm-sim-6674959984-fjl6m      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+18m         Normal    Created             pod/llm-sim-6674959984-fjl6m      Container created
+18m         Normal    Started             pod/llm-sim-6674959984-fjl6m      Container started
+18m         Warning   Unhealthy           pod/llm-sim-6674959984-4nvcw      Readiness probe failed: HTTP probe failed with statuscode: 503
+18m         Warning   Unhealthy           pod/llm-sim-6674959984-fjl6m      Startup probe failed: HTTP probe failed with statuscode: 503
+18m         Normal    SuccessfulCreate    replicaset/llm-sim-9d77b8689      Created pod: llm-sim-9d77b8689-wb7kw
+18m         Normal    Scheduled           pod/llm-sim-9d77b8689-wb7kw       Successfully assigned llm/llm-sim-9d77b8689-wb7kw to hw11-control-plane
+18m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled up replica set llm-sim-9d77b8689 from 0 to 1
+18m         Normal    Created             pod/llm-sim-9d77b8689-wb7kw       Container created
+18m         Normal    Pulled              pod/llm-sim-9d77b8689-wb7kw       Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+18m         Normal    Started             pod/llm-sim-9d77b8689-wb7kw       Container started
+18m         Warning   Unhealthy           pod/llm-sim-9d77b8689-wb7kw       Startup probe failed: Get "http://10.244.0.45:8000/health": dial tcp 10.244.0.45:8000: connect: connection refused
+18m         Normal    SuccessfulDelete    replicaset/llm-sim-6674959984     Deleted pod: llm-sim-6674959984-fjl6m
+18m         Normal    SuccessfulCreate    replicaset/llm-sim-9d77b8689      Created pod: llm-sim-9d77b8689-fvqwg
+18m         Normal    Killing             pod/llm-sim-6674959984-fjl6m      Stopping container sim
+18m         Normal    Scheduled           pod/llm-sim-9d77b8689-fvqwg       Successfully assigned llm/llm-sim-9d77b8689-fvqwg to hw11-control-plane
+18m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled up replica set llm-sim-9d77b8689 from 1 to 2
+18m         Normal    Created             pod/llm-sim-9d77b8689-fvqwg       Container created
+18m         Normal    Pulled              pod/llm-sim-9d77b8689-fvqwg       Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+18m         Normal    Started             pod/llm-sim-9d77b8689-fvqwg       Container started
+18m         Normal    Killing             pod/llm-sim-6674959984-6685c      Stopping container sim
+18m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled down replica set llm-sim-6674959984 from 1 to 0
+18m         Normal    SuccessfulDelete    replicaset/llm-sim-6674959984     Deleted pod: llm-sim-6674959984-6685c
+18m         Warning   Unhealthy           pod/llm-sim-6674959984-fjl6m      Readiness probe failed: HTTP probe failed with statuscode: 503
+18m         Warning   Unhealthy           pod/llm-sim-6674959984-6685c      Readiness probe failed: HTTP probe failed with statuscode: 503
+17m         Normal    Scheduled           pod/llm-sim-9d77b8689-kvs87       Successfully assigned llm/llm-sim-9d77b8689-kvs87 to hw11-control-plane
+17m         Normal    SuccessfulCreate    replicaset/llm-sim-9d77b8689      Created pod: llm-sim-9d77b8689-kvs87
+17m         Normal    Pulled              pod/llm-sim-9d77b8689-kvs87       Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+17m         Normal    Killing             pod/llm-sim-9d77b8689-fvqwg       Stopping container sim
+17m         Normal    Created             pod/llm-sim-9d77b8689-kvs87       Container created
+17m         Normal    Started             pod/llm-sim-9d77b8689-kvs87       Container started
+17m         Normal    Scheduled           pod/llm-sim-6674959984-nl97q      Successfully assigned llm/llm-sim-6674959984-nl97q to hw11-control-plane
+17m         Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-nl97q
+17m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled up replica set llm-sim-6674959984 from 0 to 1
+17m         Normal    Pulled              pod/llm-sim-6674959984-nl97q      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+17m         Warning   Unhealthy           pod/llm-sim-6674959984-nl97q      Startup probe failed: Get "http://10.244.0.48:8000/startup": dial tcp 10.244.0.48:8000: connect: connection refused
+17m         Normal    Started             pod/llm-sim-6674959984-nl97q      Container started
+17m         Normal    Created             pod/llm-sim-6674959984-nl97q      Container created
+17m         Warning   Unhealthy           pod/llm-sim-6674959984-nl97q      Startup probe failed: HTTP probe failed with statuscode: 503
+17m         Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-mtvtn
+17m         Normal    Killing             pod/llm-sim-9d77b8689-kvs87       Stopping container sim
+17m         Normal    SuccessfulDelete    replicaset/llm-sim-9d77b8689      Deleted pod: llm-sim-9d77b8689-kvs87
+17m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled down replica set llm-sim-9d77b8689 from 2 to 1
+17m         Normal    Scheduled           pod/llm-sim-6674959984-mtvtn      Successfully assigned llm/llm-sim-6674959984-mtvtn to hw11-control-plane
+17m         Normal    Created             pod/llm-sim-6674959984-mtvtn      Container created
+17m         Normal    Pulled              pod/llm-sim-6674959984-mtvtn      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+17m         Normal    Started             pod/llm-sim-6674959984-mtvtn      Container started
+17m         Warning   Unhealthy           pod/llm-sim-6674959984-mtvtn      Startup probe failed: Get "http://10.244.0.49:8000/startup": dial tcp 10.244.0.49:8000: connect: connection refused
+16m         Warning   Unhealthy           pod/llm-sim-6674959984-mtvtn      Startup probe failed: HTTP probe failed with statuscode: 503
+16m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled down replica set llm-sim-9d77b8689 from 1 to 0
+16m         Normal    Killing             pod/llm-sim-9d77b8689-wb7kw       Stopping container sim
+16m         Normal    SuccessfulDelete    replicaset/llm-sim-9d77b8689      Deleted pod: llm-sim-9d77b8689-wb7kw
+16m         Normal    Scheduled           pod/llm-sim-6674959984-h6wn2      Successfully assigned llm/llm-sim-6674959984-h6wn2 to hw11-control-plane
+16m         Normal    Killing             pod/llm-sim-6674959984-mtvtn      Stopping container sim
+16m         Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-h6wn2
+16m         Normal    Pulled              pod/llm-sim-6674959984-h6wn2      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+16m         Normal    Created             pod/llm-sim-6674959984-h6wn2      Container created
+16m         Normal    Started             pod/llm-sim-6674959984-h6wn2      Container started
+16m         Warning   Unhealthy           pod/llm-sim-6674959984-mtvtn      Readiness probe failed: HTTP probe failed with statuscode: 503
+16m         Warning   Unhealthy           pod/llm-sim-6674959984-h6wn2      Startup probe failed: HTTP probe failed with statuscode: 503
+15m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled up replica set llm-sim-6674959984 from 1 to 2
+15m         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled down replica set llm-sim-6674959984 from 2 to 1
+15m         Normal    SuccessfulRescale   horizontalpodautoscaler/llm-sim   New size: 2; reason: Current number of replicas below Spec.MinReplicas
+15m         Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-qwppf
+15m         Normal    Killing             pod/llm-sim-6674959984-h6wn2      Stopping container sim
+15m         Normal    SuccessfulDelete    replicaset/llm-sim-6674959984     Deleted pod: llm-sim-6674959984-h6wn2
+15m         Normal    Scheduled           pod/llm-sim-6674959984-qwppf      Successfully assigned llm/llm-sim-6674959984-qwppf to hw11-control-plane
+15m         Normal    Started             pod/llm-sim-6674959984-qwppf      Container started
+15m         Normal    Created             pod/llm-sim-6674959984-qwppf      Container created
+15m         Normal    Pulled              pod/llm-sim-6674959984-qwppf      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+15m         Warning   Unhealthy           pod/llm-sim-6674959984-h6wn2      Readiness probe failed: HTTP probe failed with statuscode: 503
+15m         Warning   Unhealthy           pod/llm-sim-6674959984-qwppf      Startup probe failed: HTTP probe failed with statuscode: 503
+14m         Normal    Scheduled           pod/llm-sim-6674959984-pk568      Successfully assigned llm/llm-sim-6674959984-pk568 to hw11-control-plane
+14m         Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-pk568
+14m         Normal    Created             pod/llm-sim-6674959984-pk568      Container created
+14m         Normal    Pulled              pod/llm-sim-6674959984-pk568      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+14m         Normal    Started             pod/llm-sim-6674959984-pk568      Container started
+14m         Warning   Unhealthy           pod/llm-sim-6674959984-pk568      Startup probe failed: HTTP probe failed with statuscode: 503
+9m          Normal    ScalingReplicaSet   deployment/llm-sim                (combined from similar events): Scaled down replica set llm-sim-6674959984 from 3 to 2
+9m          Normal    Killing             pod/llm-sim-6674959984-pk568      Stopping container sim
+9m          Normal    SuccessfulDelete    replicaset/llm-sim-6674959984     Deleted pod: llm-sim-6674959984-pk568
+8m56s       Warning   Unhealthy           pod/llm-sim-6674959984-pk568      Readiness probe failed: HTTP probe failed with statuscode: 503
+8m54s       Warning   Unhealthy           pod/llm-sim-6674959984-pk568      Readiness probe failed: Get "http://10.244.0.52:8000/ready": dial tcp 10.244.0.52:8000: connect: connection refused
+4m44s       Normal    Scheduled           pod/llm-sim-6674959984-4wwmc      Successfully assigned llm/llm-sim-6674959984-4wwmc to hw11-control-plane
+4m44s       Normal    SuccessfulCreate    replicaset/llm-sim-6674959984     Created pod: llm-sim-6674959984-4wwmc
+4m44s       Normal    ScalingReplicaSet   deployment/llm-sim                Scaled up replica set llm-sim-6674959984 from 2 to 3
+4m44s       Normal    SuccessfulRescale   horizontalpodautoscaler/llm-sim   New size: 3; reason: cpu resource utilization (percentage of request) above target
+4m42s       Normal    Pulled              pod/llm-sim-6674959984-4wwmc      Container image "hw11-sim:0.1.1" already present on machine and can be accessed by the pod
+4m42s       Normal    Created             pod/llm-sim-6674959984-4wwmc      Container created
+4m41s       Normal    Started             pod/llm-sim-6674959984-4wwmc      Container started
+4m41s       Warning   Unhealthy           pod/llm-sim-6674959984-4wwmc      Startup probe failed: Get "http://10.244.0.53:8000/startup": dial tcp 10.244.0.53:8000: connect: connection refused
+4m21s       Warning   Unhealthy           pod/llm-sim-6674959984-4wwmc      Startup probe failed: HTTP probe failed with statuscode: 503
+27s         Normal    SuccessfulDelete    replicaset/llm-sim-6674959984     Deleted pod: llm-sim-6674959984-4wwmc
+27s         Normal    Killing             pod/llm-sim-6674959984-4wwmc      Stopping container sim
+27s         Normal    SuccessfulRescale   horizontalpodautoscaler/llm-sim   New size: 2; reason: All metrics below target
+27s         Normal    ScalingReplicaSet   deployment/llm-sim                Scaled down replica set llm-sim-6674959984 from 3 to 2
+21s         Warning   Unhealthy           pod/llm-sim-6674959984-4wwmc      Readiness probe failed: HTTP probe failed with statuscode: 503

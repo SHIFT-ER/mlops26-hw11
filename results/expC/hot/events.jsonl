@@ -1,0 +1,10 @@
+{"event": "hpa_config", "hpa": {"behavior": {"scaleDown": {"policies": [{"periodSeconds": 15, "type": "Pods", "value": 1}], "selectPolicy": "Max", "stabilizationWindowSeconds": 60}, "scaleUp": {"policies": [{"periodSeconds": 15, "type": "Pods", "value": 1}], "selectPolicy": "Max", "stabilizationWindowSeconds": 0}}, "maxReplicas": 3, "metrics": [{"resource": {"name": "cpu", "target": {"averageUtilization": 60, "type": "Utilization"}}, "type": "Resource"}], "minReplicas": 2, "scaleTargetRef": {"apiVersion": "apps/v1", "kind": "Deployment", "name": "llm-sim"}}, "ts": 1794690144.108852}
+{"event": "alert_state", "alert": "SimHighTTFC", "state": "pending", "prev": "inactive", "ts": 1794690166.618156}
+{"event": "alert_state", "alert": "SimHighTTFC", "state": "firing", "prev": "pending", "ts": 1794690197.289978}
+{"event": "alert_state", "alert": "SimHighErrorRatio", "state": "pending", "prev": "inactive", "ts": 1794690201.346852}
+{"event": "alert_state", "alert": "SimHighErrorRatio", "state": "firing", "prev": "pending", "ts": 1794690231.82737}
+{"event": "load_finished", "ts": 1794690362.426861}
+{"event": "alert_state", "alert": "SimHighErrorRatio", "state": "inactive", "prev": "firing", "ts": 1794690406.3493109}
+{"event": "alert_state", "alert": "SimHighTTFC", "state": "inactive", "prev": "firing", "ts": 1794690412.4082172}
+{"event": "back_to_min", "after_load_s": 77.1, "ts": 1794690439.512747}
+{"event": "summary", "attempts": 504, "logical": 504, "outcomes": {"ok": 354, "rejected": 150}, "ok": 354, "logical_ok": 354, "error_share": 0.2976, "timeout_share": 0.0, "ttfc_p50": 10.1656, "ttfc_p95": 14.3492, "dur_p50": 10.6045, "dur_p95": 14.8871, "n_ttfc": 354, "send_lag_p95": 0.0088, "send_lag_max": 0.0303, "mean_ttfc": 8.8732, "ts": 1794690462.066543}

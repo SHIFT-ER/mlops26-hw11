@@ -1,0 +1,22 @@
+{
+ "version": "B",
+ "kind": "simulated-model",
+ "reply_prefix": "sim-B",
+ "vocabulary": [
+  "kubernetes",
+  "pod",
+  "replica",
+  "queue",
+  "warmup",
+  "answer",
+  "chunk",
+  "stream",
+  "latency",
+  "cache",
+  "prefix",
+  "service",
+  "version",
+  "metric"
+ ],
+ "note": "Файл модели-имитатора: не веса нейросети. Хеш закреплён в Helm values."
+}

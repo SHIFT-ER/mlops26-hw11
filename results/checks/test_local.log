@@ -1,0 +1,7 @@
+
+tests/test_local.py::test_4_failure_accounting PASSED                    [ 25%]
+tests/test_local.py::test_router_affinity_and_overflow PASSED            [ 50%]
+tests/test_local.py::test_prefix_cache_bounded_lru PASSED                [ 75%]
+tests/test_local.py::test_artifact_hash_is_verified PASSED               [100%]
+
+============================== 4 passed in 3.65s ===============================
