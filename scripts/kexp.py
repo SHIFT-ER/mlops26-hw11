@@ -146,7 +146,8 @@ def run_load(schedule: Path, outdir: Path, run: str, target: str, clients=range(
                '--start-at', f'{start_at:.3f}', '--run', run, '--retries', str(retries),
                '--timeout', str(timeout), '--out', f'/tmp/{run}.jsonl'] + ([] if keepalive else ['--no-keepalive'])
         procs.append(subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
-    meta = dict(run=run, target=target, start_at=start_at, schedule=str(schedule), retries=retries, timeout=timeout,
+    sched_rel = str(Path(schedule).resolve().relative_to(ROOT)) if Path(schedule).resolve().is_relative_to(ROOT) else str(schedule)
+    meta = dict(run=run, target=target, start_at=start_at, schedule=sched_rel, retries=retries, timeout=timeout,
                 keepalive=keepalive)
     if not wait:
         return procs, meta

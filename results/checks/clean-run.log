@@ -132,9 +132,9 @@ make up  5,27s user 6,77s system 5% cpu 3:21,57 total
 ## make test-local
 uv run pytest tests/test_local.py -v
 ============================= test session starts ==============================
-platform darwin -- Python 3.12.4, pytest-8.4.2, pluggy-1.7.0 -- /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11/.venv/bin/python
+platform darwin -- Python 3.12.4, pytest-8.4.2, pluggy-1.7.0 -- .venv/bin/python
 cachedir: .pytest_cache
-rootdir: /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11
+rootdir: .
 configfile: pyproject.toml
 plugins: anyio-4.16.0
 collecting ... collected 4 items
@@ -149,9 +149,9 @@ tests/test_local.py::test_artifact_hash_is_verified PASSED               [100%]
 ## make test-k8s
 uv run pytest tests/test_k8s.py -v
 ============================= test session starts ==============================
-platform darwin -- Python 3.12.4, pytest-8.4.2, pluggy-1.7.0 -- /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11/.venv/bin/python
+platform darwin -- Python 3.12.4, pytest-8.4.2, pluggy-1.7.0 -- .venv/bin/python
 cachedir: .pytest_cache
-rootdir: /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11
+rootdir: .
 configfile: pyproject.toml
 plugins: anyio-4.16.0
 collecting ... collected 5 items

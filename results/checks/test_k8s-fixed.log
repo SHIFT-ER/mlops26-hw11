@@ -1,4 +1,4 @@
-rootdir: /Users/pavel_sab/Documents/MLOps 7 сем/ДЗ/ДЗ11/hw11
+rootdir: .
 configfile: pyproject.toml
 plugins: anyio-4.16.0
 collecting ... collected 5 items
